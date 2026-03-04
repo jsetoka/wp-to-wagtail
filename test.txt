@@ -38,13 +38,13 @@
 <li><strong>COTEXA CONGO - Projet PSTAT :</strong><br/>Contrôleur technique des lots MEP</li>
 
 
-<li><strong>COTEXA CONGO - Réhabilitation du siège de la BDEAC :</strong><p>Contrôleur technique des lots MEP</li>
+<li><strong>COTEXA CONGO - Réhabilitation du siège de la BDEAC :</strong><br/>Contrôleur technique des lots MEP</li>
 
 
-<li><strong>MBTP - Construction de la Tour ACACIA :</strong><p>Ingénieur-assistant des études MEP</li>
+<li><strong>MBTP - Construction de la Tour ACACIA :</strong><br/>Ingénieur-assistant des études MEP</li>
 
 
-<li><strong>DAE - Construction de la base BRALICO (proximité aéroport Maya-Maya, Brazzaville) :</strong><p>Responsable des études techniques MEP</li>
+<li><strong>DAE - Construction de la base BRALICO (proximité aéroport Maya-Maya, Brazzaville) :</strong><br/>Responsable des études techniques MEP</li>
 </ul>
 
 
