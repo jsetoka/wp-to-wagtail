@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+  <h1>Créer un compte</h1>
+  <form method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">S’inscrire</button>
+  </form>
+
+  <p><a href="{% url 'account_login' %}">J’ai déjà un compte</a></p>
+{% endblock %}

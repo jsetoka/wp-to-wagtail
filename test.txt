@@ -1,0 +1,61 @@
+
+<h1 class="wp-block-heading has-neve-link-hover-color-color has-text-color has-link-color">Un ingénieur, un impact</h1>
+
+
+<div id="wp-block-themeisle-blocks-slider-4fe76578" class="wp-block-themeisle-blocks-slider glide" data-per-view="3" data-gap="0" data-peek="0" data-autoplay="true" data-height="" data-hide-arrows="false" data-transition="ease-in"><div class="glide__track" data-glide-el="track"><div class="glide__slides"><div class="wp-block-themeisle-blocks-slider-item-wrapper glide__slide" tabindex="0"><figure><img class="wp-block-themeisle-blocks-slider-item" src="https://oic.cg/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-28-at-11.43.38-1.jpeg" alt="" title="" data-id="876"/></figure></div><div class="wp-block-themeisle-blocks-slider-item-wrapper glide__slide" tabindex="0"><figure><img class="wp-block-themeisle-blocks-slider-item" src="https://oic.cg/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-28-at-11.43.39-1-2.jpeg" alt="" title="" data-id="879"/></figure></div><div class="wp-block-themeisle-blocks-slider-item-wrapper glide__slide" tabindex="0"><figure><img class="wp-block-themeisle-blocks-slider-item" src="https://oic.cg/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-28-at-11.43.39-2-1.jpeg" alt="" title="" data-id="875"/></figure></div><div class="wp-block-themeisle-blocks-slider-item-wrapper glide__slide" tabindex="0"><figure><img class="wp-block-themeisle-blocks-slider-item" src="https://oic.cg/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-28-at-11.43.39-3-1.jpeg" alt="" title="" data-id="878"/></figure></div><div class="wp-block-themeisle-blocks-slider-item-wrapper glide__slide" tabindex="0"><figure><img class="wp-block-themeisle-blocks-slider-item" src="https://oic.cg/wp-content/uploads/2025/04/WhatsApp-Image-2025-04-28-at-11.43.39-4.jpeg" alt="" title="" data-id="877"/></figure></div></div><div class="glide__bullets" data-glide-el="controls[nav]"><button class="glide__bullet" data-glide-dir="=0"></button><button class="glide__bullet" data-glide-dir="=1"></button><button class="glide__bullet" data-glide-dir="=2"></button><button class="glide__bullet" data-glide-dir="=3"></button><button class="glide__bullet" data-glide-dir="=4"></button></div></div></div>
+
+
+<h2 class="wp-block-heading has-neve-link-color-color has-text-color has-link-color">Un acteur clé du développement des projets MEP au Congo</h2>
+
+
+<p>Ingénieur en électromécanique de formation,&nbsp;<strong>BIKOUTA BIAHOUA Don De Dieu Prince Isidora</strong>&nbsp;s’impose comme une référence dans l’univers du MEP (Mécanique, Électricité, Plomberie). Avec rigueur et passion, il accompagne les projets d’envergure, de la phase d'étude à la livraison finale, en assurant un haut niveau d'exigence technique.</p>
+
+
+<h2 class="wp-block-heading has-neve-link-color-color has-text-color has-link-color">Ses missions</h2>
+
+
+<p>Au cœur de ses interventions :</p>
+
+
+<ul class="wp-block-list">
+<li>Le&nbsp;<strong>contrôle technique</strong>&nbsp;des installations MEP</li>
+
+
+<li>La&nbsp;<strong>conception et les études</strong>&nbsp;des systèmes de bâtiment</li>
+
+
+<li>La&nbsp;<strong>coordination des équipes techniques</strong>&nbsp;sur le terrain</li>
+</ul>
+
+
+<h2 class="wp-block-heading has-neve-link-color-color has-text-color has-link-color">Projets emblématiques</h2>
+
+
+<p><strong>Sur le terrain, ses compétences parlent d’elles-mêmes :</strong></p>
+
+
+<ul class="wp-block-list">
+<li><strong>COTEXA CONGO - Projet PSTAT :</strong><br/>Contrôleur technique des lots MEP</li>
+
+
+<li><strong>COTEXA CONGO - Réhabilitation du siège de la BDEAC :</strong><p>Contrôleur technique des lots MEP</li>
+
+
+<li><strong>MBTP - Construction de la Tour ACACIA :</strong><p>Ingénieur-assistant des études MEP</li>
+
+
+<li><strong>DAE - Construction de la base BRALICO (proximité aéroport Maya-Maya, Brazzaville) :</strong><p>Responsable des études techniques MEP</li>
+</ul>
+
+
+<h2 class="wp-block-heading has-neve-link-color-color has-text-color has-link-color">Une expertise au service de l’excellence</h2>
+
+
+<p>Fort de son expertise, l’ingénieur BIKOUTA BIAHOUA place la qualité, l'innovation et la maîtrise technique au centre de chacun de ses projets. Sa contribution renforce la dynamique de modernisation des infrastructures au Congo et inspire les nouvelles générations d’ingénieurs.</p>
+
+
+<h2 class="wp-block-heading has-neve-link-color-color has-text-color has-link-color">Contactez-le</h2>
+
+
+<p>Tél./WhatsApp : <a href="tel:242069951028">+242 06 995 10 28</a> / <a href="https://wa.me/242067033232">+242 06 703 32 32</a><p>Email : <a href="mailto:dondedieubikouta@gmail.com">dondedieubikouta@gmail.com</a><p>LinkedIn : <a href="https://www.linkedin.com/in/don-de-dieu-prince-isidora-bikouta-biahoua-870034161">https://www.linkedin.com/in/don-de-dieu-prince-isidora-bikouta-biahoua-870034161</a></p>
+

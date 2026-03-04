@@ -1,0 +1,27 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    working_dir: /app
+    volumes:
+      - .:/app
+      - media:/app/media
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DATABASE_URL: postgres://wagtail:wagtail@db:5432/wagtail
+    depends_on:
+      - db
+    command: bash -lc "cd /app && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: wagtail
+      POSTGRES_USER: wagtail
+      POSTGRES_PASSWORD: wagtail
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+  media:

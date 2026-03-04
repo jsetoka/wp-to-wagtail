@@ -1,0 +1,116 @@
+/* ===== Palette Kerene's Digital — tendance BLEU ===== */
+:root{
+    /* Brand */
+    --brand-navy:   #0A2540;   /* navbars / footer */
+    --brand-navy-2: #0D2F57;   /* hover/variants */
+  
+    --brand-blue:   #2563EB;   /* primaire (CTA, liens, accents) */
+    --brand-blue-2: #1E40AF;   /* primaire hover/focus */
+    --brand-sky:    #98cdf5;   /* accent clair (hover doux, soulignés) */
+    --brand-perso:  #daebf3;   /* accent clair (hover doux, soulignés) */
+  
+    /* Neutres */
+    --brand-bg:     #F7FAFF;   /* fond très clair bleuté */
+    --brand-ink:    #0F172A;   /* texte principal (slate-900) */
+    --brand-muted:  #64748B;   /* texte secondaire */
+    --brand-border: #E2E8F0;   /* bordures */
+  
+    /* Bootstrap primary = bleu */
+    --bs-primary:   var(--brand-blue);
+  }
+  
+  /* Fond & texte */
+  /* html, body{ background: var(--brand-bg); color: var(--brand-ink); } */
+  
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #2563EB; 
+    background: url("/static/images/logo-kd.png") no-repeat center center;
+    background-size: 100%;   /* ajuste la taille */
+    opacity: 0.1;            /* transparence */
+    z-index: -1;              /* reste derrière le contenu */
+    pointer-events: block;     /* évite de bloquer les clics */
+  }
+  
+  .blog-body {
+    background: #fdfdfd;   /* fond clair distinct */
+    /* font-family: "Georgia", serif; */
+    line-height: 1.7;
+  }
+  .blog-body h1, .blog-body h2, .blog-body h3 {
+    color: #0B1F3A;  /* ta couleur principale */
+  }
+  
+  .featured-articles .card-img-top { object-fit: cover; height: 360px; }
+  @media (max-width: 991.98px) {
+    .featured-articles .card-img-top { height: 260px; }
+  }
+  
+  
+  .tag-cloud .tag { text-decoration: none; margin: 0 .4rem .5rem 0; display: inline-block; }
+  .tag-size-1 { font-size: .9rem; opacity: .7; }
+  .tag-size-2 { font-size: 1rem; }
+  .tag-size-3 { font-size: 1.15rem; font-weight: 600; }
+  .tag-size-4 { font-size: 1.3rem; font-weight: 700; }
+  
+  /* Liens */
+  a{ color: var(--brand-blue); }
+  a:hover{ color: var(--brand-sky); }
+  
+  /* Header / footer existants */
+  .bg-sky{ background-color: var(--brand-sky) !important; }
+  .bg-perso{ background-color: var(--brand-perso) !important; }
+  .bg-navy{ background-color: var(--brand-navy) !important; }
+  .text-navy{ color: var(--brand-navy) !important; }
+  
+  /* Boutons (Bootstrap override) */
+  .btn-primary{
+    background-color: var(--brand-blue) !important;
+    border-color: var(--brand-blue-2) !important;
+    color: #fff !important;
+  }
+  .btn-primary:hover{
+    background-color: var(--brand-blue-2) !important;
+    border-color: var(--brand-blue-2) !important;
+  }
+  
+  /* Cartes / séparateurs / muted */
+  .card{ border-color: var(--brand-border); }
+  .text-muted{ color: var(--brand-muted) !important; }
+  
+  /* Soulignement animé sous les liens du menu – sans markup supplémentaire */
+  .navbar-nav .nav-link{
+    position: relative;
+    transition: color .25s ease;
+  }
+  .navbar-nav .nav-link::after{
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0.25rem;
+    height: 2px;
+    width: 0;
+    margin: 0 auto;
+    background: var(--brand-sky);
+    transition: width .25s ease;
+  }
+  .navbar-nav .nav-link:hover::after{ width: 80%; }
+  
+  /* Optionnels / utilitaires */
+  .backdrop-blur{ backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .bg-midnight{ background-color: #0B1220 !important; } /* bleu nuit */
+  .wrap{ max-width: 1000px; margin: 0 auto; padding: 1rem; }
+  
+  .richtext p { margin-bottom: 1rem; }
+  .richtext h2, .richtext h3 { margin-top: 1.5rem; margin-bottom: .75rem; }
+  .richtext ul, .richtext ol { padding-left: 1.25rem; }
+  
+  .wizard-step ul { list-style: none; padding-left: 0; }
+  .wizard-step li { margin-bottom: .75rem; }
+  .wizard-step input[type="radio"] { margin-right: .5rem; }
+  
+  

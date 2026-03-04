@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <h1>Confirmation d’email</h1>
+
+  {% if confirmation %}
+    <p>Confirmer l’adresse email : {{ confirmation.email_address.email }}</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit">Confirmer</button>
+    </form>
+  {% else %}
+    <p>Ce lien de confirmation est invalide ou expiré.</p>
+  {% endif %}
+</div>
+{% endblock %}

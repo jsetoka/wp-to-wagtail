@@ -1,0 +1,92 @@
+{% if menu %}
+<nav>
+  <ul>
+    {% for item in menu.items.all %}
+
+      {% if item.visibility == "all" %}
+        <li>
+          <a href="{{ item.url }}">{{ item.title }}</a>
+
+          {% if item.show_children %}
+            {# sous-liens manuels #}
+            {% if item.children.all %}
+              <ul>
+                {% for child in item.children.all %}
+                  <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+                {% endfor %}
+              </ul>
+
+            {# sinon, enfants de la page interne #}
+            {% elif item.link_page %}
+              {% with kids=item.link_page.get_children.live.in_menu %}
+                {% if kids %}
+                  <ul>
+                    {% for p in kids %}
+                      <li><a href="{{ p.url }}">{{ p.title }}</a></li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              {% endwith %}
+            {% endif %}
+          {% endif %}
+        </li>
+
+      {% elif item.visibility == "auth" %}
+        {% if request.user.is_authenticated %}
+          <li>
+            <a href="{{ item.url }}">{{ item.title }}</a>
+
+            {% if item.show_children %}
+              {% if item.children.all %}
+                <ul>
+                  {% for child in item.children.all %}
+                    <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% elif item.link_page %}
+                {% with kids=item.link_page.get_children.live.in_menu %}
+                  {% if kids %}
+                    <ul>
+                      {% for p in kids %}
+                        <li><a href="{{ p.url }}">{{ p.title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endwith %}
+              {% endif %}
+            {% endif %}
+          </li>
+        {% endif %}
+
+      {% elif item.visibility == "anon" %}
+        {% if not request.user.is_authenticated %}
+          <li>
+            <a href="{{ item.url }}">{{ item.title }}</a>
+
+            {% if item.show_children %}
+              {% if item.children.all %}
+                <ul>
+                  {% for child in item.children.all %}
+                    <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% elif item.link_page %}
+                {% with kids=item.link_page.get_children.live.in_menu %}
+                  {% if kids %}
+                    <ul>
+                      {% for p in kids %}
+                        <li><a href="{{ p.url }}">{{ p.title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endwith %}
+              {% endif %}
+            {% endif %}
+          </li>
+        {% endif %}
+      {% endif %}
+
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}

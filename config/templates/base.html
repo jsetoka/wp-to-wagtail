@@ -1,0 +1,238 @@
+
+{% load static wagtailcore_tags wagtailuserbar site_components %}
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Ordre des Ingénieurs du Congo{% endblock %}</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    {# ---------- SEO de base ---------- #}
+    <meta name="robots" content="{% block meta_robots %}index,follow{% endblock %}" />
+
+    <meta name="description"
+          content="{% block meta_description %}
+            {% if page and page.search_description %}{{ page.search_description }}{% else %}
+            Formations professionnelles en intelligence artificielle, data et automatisation.
+            {% endif %}
+          {% endblock %}" />
+
+    {# keywords : optionnel (Google s'en fiche, mais pas “dangereux”) #}
+    <meta name="keywords"
+          content="{% block meta_keywords %}formation IA, intelligence artificielle, data, automatisation, digital{% endblock %}" />
+
+    <meta name="author" content="Ordre des Ingénieurs du Congo" />
+
+    {# Canonical #}
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+
+    <link rel="stylesheet" href="{% static 'css/site.css' %}" />
+
+
+  </head>
+
+  <body class="d-flex flex-column min-vh-100 bg-perso">
+    {% wagtailuserbar %}
+
+    <header class="bg-navy border-bottom border-white border-opacity-10 sticky-top">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-navy py-2">
+        <div class="container-fluid">
+
+          <!-- Brand -->
+          <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+            <img src="{% static 'images/logo_OIC.png' %}" alt="Ordre des Ingénieurs du Congo" height="44" class="rounded-2">
+            <div class="lh-1">
+              <div class="fw-bold text-light">OIC</div>
+              <div class="text-light text-opacity-75 small d-none d-sm-block">Ordre des Ingénieurs du Congo</div>
+            </div>
+          </a>
+
+          <!-- Mobile toggler -->
+          <button class="navbar-toggler ms-auto border-0 shadow-none" type="button"
+                  data-bs-toggle="offcanvas" data-bs-target="#mainOffcanvas"
+                  aria-controls="mainOffcanvas" aria-label="Menu">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <!-- Desktop -->
+          <div class="collapse navbar-collapse d-none d-lg-flex">
+
+          {% get_menu_items "main" as main_menu_items %}
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+
+              {# MENU DYNAMIQUE #}
+              {% for item in main_menu_items %}
+                {% if not item.requires_login or user.is_authenticated %}
+                  {% with children=item.children.all %}
+                    {% if item.show_children and children %}
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-3 rounded-2"
+                          href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          {{ item.title }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                          {% for child in children %}
+                            <li>
+                              <a class="dropdown-item py-2" href="{{ child.url|default:'#' }}">
+                                {{ child.title }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </li>
+                    {% else %}
+                      <li class="nav-item">
+                        <a class="nav-link px-3 rounded-2" href="{{ item.url|default:'#' }}">
+                          {{ item.title }}
+                        </a>
+                      </li>
+                    {% endif %}
+                  {% endwith %}
+                {% endif %}
+              {% endfor %}
+
+              <li class="nav-item mx-2 d-none d-lg-block">
+                <span class="text-white text-opacity-25">|</span>
+              </li>
+
+              {# AUTH ZONE (modern) #}
+              {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle px-3 d-flex align-items-center gap-2 rounded-2"
+                    href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-10"
+                          style="width:32px;height:32px;">
+                      <span class="small text-light fw-semibold">
+                        {{ user.username|slice:":1"|upper }}
+                      </span>
+                    </span>
+                    <span class="text-light">{{ user.username }}</span>
+                  </a>
+
+                  <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <li>
+                      <a class="dropdown-item py-2" href="/admin/">
+                        Administration
+                      </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                      <form method="post" action="" class="px-2 py-1">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                          Déconnexion
+                        </button>
+                      </form>
+                    </li>
+                  </ul>
+                </li>
+              {% else %}
+                <li class="nav-item">
+                  <a class="btn btn-sm btn-outline-info ms-lg-2" href="{% url 'account_login' %}">
+                    Connexion
+                  </a>
+                </li>
+              {% endif %}
+
+            </ul>
+          </div>
+
+          <!-- Offcanvas mobile -->
+          <div class="offcanvas offcanvas-start text-bg-dark d-lg-none"
+              tabindex="-1" id="mainOffcanvas" aria-labelledby="mainOffcanvasLabel">
+            <div class="offcanvas-header border-bottom border-white border-opacity-10">
+              <div>
+                <h5 class="offcanvas-title mb-0" id="mainOffcanvasLabel">Menu</h5>
+                <div class="small text-white text-opacity-75">OIC</div>
+              </div>
+              <button type="button" class="btn-close btn-close-white"
+                      data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+            </div>
+
+            <div class="offcanvas-body">
+              <!-- Auth top -->
+              <div class="p-3 rounded-3 bg-white bg-opacity-10 mb-3">
+                {% if user.is_authenticated %}
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-white bg-opacity-10 d-flex align-items-center justify-content-center"
+                        style="width:36px;height:36px;">
+                      <span class="fw-semibold">{{ user.username|slice:":1"|upper }}</span>
+                    </div>
+                    <div>
+                      <div class="fw-semibold">{{ user.username }}</div>
+                      <div class="small text-white text-opacity-75">Compte connecté</div>
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                      <div class="fw-semibold">Bienvenue</div>
+                      <div class="small text-white text-opacity-75">Connecte-toi pour accéder aux espaces privés</div>
+                    </div>
+                    <a class="btn btn-sm btn-outline-info" href="{% url 'account_login' %}">Connexion</a>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Menu items -->
+              <ul class="navbar-nav">
+                {% for item in main_menu_items %}
+                  {% if not item.requires_login or user.is_authenticated %}
+                    {% with children=item.children.all %}
+                      {% if item.show_children and children %}
+                        <li class="nav-item mb-2">
+                          <div class="fw-semibold text-white text-opacity-75 mb-1">{{ item.title }}</div>
+                          <ul class="list-unstyled ps-2 mb-0">
+                            {% for child in children %}
+                              <li class="mb-1">
+                                <a class="nav-link py-1" href="{{ child.url|default:'#' }}">
+                                  {{ child.title }}
+                                </a>
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        </li>
+                      {% else %}
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ item.url|default:'#' }}">{{ item.title }}</a>
+                        </li>
+                      {% endif %}
+                    {% endwith %}
+                  {% endif %}
+                {% endfor %}
+              </ul>
+
+              {% if user.is_authenticated %}
+                <hr class="my-3 border-white border-opacity-10">
+                <form method="post" action="">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger w-100">
+                    Déconnexion
+                  </button>
+                </form>
+              {% endif %}
+
+            </div>
+          </div>
+
+        </div>
+      </nav>
+    </header>
+
+
+    <main class="container my-3">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-12 col-xl-10">
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+    </main>
+    {% include "components/footer.html" %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

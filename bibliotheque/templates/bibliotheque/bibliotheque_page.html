@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+  <h1>{{ page.title }}</h1>
+
+  {% if page.intro %}{{ page.intro|richtext }}{% endif %}
+
+  <div class="downloads">
+    <table>
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Catégories</th>
+          <th>Date de mise à jour</th>
+          <th>Télécharger</th>
+          <th>Downloads</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for item in page.items.all %}
+          <tr>
+            <td>{{ item.title }}</td>
+            <td>{% if item.category %}{{ item.category.title }}{% endif %}</td>
+            <td>{{ item.updated_at|date:"d F Y" }}</td>
+            <td>
+              {% if item.document %}
+                <a href="{{ page.url }}download/{{ item.id }}/">Télécharger</a>
+              {% endif %}
+            </td>
+            <td>{{ item.download_count }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

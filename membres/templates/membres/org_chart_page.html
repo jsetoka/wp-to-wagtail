@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+  <h1 class="mb-3">{{ page.title }}</h1>
+  {% if page.intro %}<p class="text-muted">{{ page.intro }}</p>{% endif %}
+
+  {% for s in page.sections.all %}
+    <h2 class="h4 mt-4 mb-3">{{ s.section.title }}</h2>
+
+    <div class="row g-3 justify-content-center">
+      {% for sm in s.members.all %}
+        {% with m=sm.member %}
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm ">
+              {% if m.photo %}
+                {% image m.photo fill-400x400 as img %}
+                <img class="card-img-top" src="{{ img.url }}" alt="{{ m.name }}">
+              {% endif %}
+              <div class="card-body text-center">
+                <div class="text-uppercase small text-secondary fw-semibold">{{ m.role }}</div>
+                <div class="fs-5 fw-bold">{{ m.name }}</div>
+                {% if m.subtitle %}
+                  <div class="text-muted">{{ m.subtitle }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% endfor %}
+{% endblock %}
