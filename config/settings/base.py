@@ -49,13 +49,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "blog",
-    "membres",
+    "members",
     "bibliotheque",
+
 
     # allauth
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "django.contrib.humanize", 
 ]
 
 MIDDLEWARE = [

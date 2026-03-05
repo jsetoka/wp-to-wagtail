@@ -1,5 +1,9 @@
 
-{% load static wagtailcore_tags wagtailuserbar site_components %}
+{% load static wagtailcore_tags wagtailuserbar site_components user_menu_fragment %}
+{% load wagtailsettings_tags %}
+{% get_settings use_default_site=True %}
+
+
 <!DOCTYPE html>
 <html lang="fr">
   <head>
@@ -100,44 +104,66 @@
                 <span class="text-white text-opacity-25">|</span>
               </li>
 
-              {# AUTH ZONE (modern) #}
-              {% if user.is_authenticated %}
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle px-3 d-flex align-items-center gap-2 rounded-2"
-                    href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-10"
-                          style="width:32px;height:32px;">
-                      <span class="small text-light fw-semibold">
-                        {{ user.username|slice:":1"|upper }}
-                      </span>
-                    </span>
-                    <span class="text-light">{{ user.username }}</span>
-                  </a>
+ 
+{# AUTH ZONE (fragment) #}
+{% if user.is_authenticated %}
+  {% get_user_menu_fragment "default" as user_menu %}
 
-                  <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                    <li>
-                      <a class="dropdown-item py-2" href="/admin/">
-                        Administration
-                      </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                      <form method="post" action="" class="px-2 py-1">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">
-                          Déconnexion
-                        </button>
-                      </form>
-                    </li>
-                  </ul>
-                </li>
-              {% else %}
-                <li class="nav-item">
-                  <a class="btn btn-sm btn-outline-info ms-lg-2" href="{% url 'account_login' %}">
-                    Connexion
-                  </a>
-                </li>
-              {% endif %}
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle px-3 d-flex align-items-center gap-2 rounded-2"
+      href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-10"
+            style="width:32px;height:32px;">
+        <span class="small text-light fw-semibold">
+          {{ user.username|slice:":1"|upper }}
+        </span>
+      </span>
+      <span class="text-light">{{ user.username }}</span>
+    </a>
+
+    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+
+      {# Liens configurés dans le fragment #}
+      {% if user_menu %}
+        {% for link in user_menu.items.all %}
+          {% if not link.only_staff or user.is_staff %}
+            <li>
+              <a class="dropdown-item py-2"
+                 href="{{ link.url }}">
+                {{ link.label }}
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {# fallback si le fragment n’existe pas #}
+        <li><a class="dropdown-item py-2" href="/me/cotisations/">Mes cotisations</a></li>
+        {% if user.is_staff %}
+          <li><a class="dropdown-item py-2" href="/admin/">Administration</a></li>
+        {% endif %}
+      {% endif %}
+
+      <li><hr class="dropdown-divider"></li>
+
+      {# Logout allauth (IMPORTANT) #}
+      <li>
+        <form method="post" action="{% url 'account_logout' %}" class="px-2 py-1">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+            Déconnexion
+          </button>
+        </form>
+      </li>
+    </ul>
+  </li>
+
+{% else %}
+  <li class="nav-item">
+    <a class="btn btn-sm btn-outline-info ms-lg-2" href="{% url 'account_login' %}">
+      Connexion
+    </a>
+  </li>
+{% endif %}
 
             </ul>
           </div>

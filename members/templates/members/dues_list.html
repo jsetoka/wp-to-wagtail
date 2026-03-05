@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex align-items-baseline justify-content-between mb-3">
+    <h1 class="h4 mb-0">Mes cotisations - {{ member }}</h1>
+  </div>
+
+  {% if dues %}
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Année</th>
+            <th class="text-end">Montant dû</th>
+            <th class="text-end">Payé</th>
+            <th class="text-end">Reste</th>
+            <th>Statut</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in dues %}
+            <tr>
+              <td class="fw-semibold">{{ d.fee.year }}</td>
+              <td class="text-end">{{ d.amount_due }} {{ d.fee.currency }}</td>
+              <td class="text-end">{{ d.amount_paid }} {{ d.fee.currency }}</td>
+              <td class="text-end">{{ d.balance }} {{ d.fee.currency }}</td>
+              <td>
+                {% if d.status == "paid" %}
+                  <span class="badge text-bg-success">Payé</span>
+                {% elif d.status == "partial" %}
+                  <span class="badge text-bg-warning">Partiel</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">À payer</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-primary" href="{% url 'dues_detail' d.fee.year %}">
+                  Voir / Payer
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-light border mb-0">
+      Aucune cotisation enregistrée pour le moment.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

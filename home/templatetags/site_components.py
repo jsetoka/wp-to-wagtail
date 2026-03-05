@@ -18,3 +18,10 @@ def get_menu_items(name="main"):
 def footer_text(context, title="default"):
     footer = FooterText.objects.filter(title=title).first()
     return {"footer": footer}
+
+
+from members.models import UserMenuFragment
+
+@register.simple_tag
+def get_user_menu_fragment(name="default"):
+    return UserMenuFragment.objects.filter(name=name).first()

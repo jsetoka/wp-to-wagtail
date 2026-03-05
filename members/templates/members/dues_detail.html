@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row">
+
+        <!-- COLONNE PRINCIPALE -->
+        <div class="col-lg-8">
+
+            <h1 class="mb-4">
+                Cotisation {{ dues.fee.year }}
+            </h1>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+
+                    <div class="row text-center">
+
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Montant total</h6>
+                            <h4>{{ dues.amount_due|intcomma }} {{ dues.fee.currency }}</h4>
+                        </div>
+
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Payé</h6>
+                            <h4 class="text-success">
+                                {{ dues.amount_paid|intcomma }} {{ dues.fee.currency }}
+                            </h4>
+                        </div>
+
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Reste à payer</h6>
+                            <h4 class="text-danger">
+                                {{ dues.balance|intcomma }} {{ dues.fee.currency }}
+                            </h4>
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center">
+
+                        {% if dues.status == "paid" %}
+                            <span class="badge bg-success p-2">
+                                Cotisation entièrement payée
+                            </span>
+
+                        {% elif dues.status == "partial" %}
+                            <span class="badge bg-warning text-dark p-2">
+                                Paiement partiel
+                            </span>
+
+                        {% else %}
+                            <span class="badge bg-danger p-2">
+                                Non payée
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between small text-muted mb-1">
+                        <span>Progression</span>
+                        <span>{{ dues.progress_percent }}%</span>
+                    </div>
+
+                    <div class="progress" role="progressbar"
+                        aria-valuenow="{{ dues.progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" style="width: {{ dues.progress_percent }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- HISTORIQUE DES PAIEMENTS -->
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    <strong>Historique des paiements</strong>
+                </div>
+
+                <div class="card-body p-0">
+
+                    <table class="table table-striped mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Méthode</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for p in payments %}
+
+                            <tr>
+
+                                <td>
+                                    {{ p.initiated_at|date:"d/m/Y H:i" }}
+                                </td>
+
+                                <td>
+                                    {{ p.amount|intcomma }} {{ dues.fee.currency }}
+                                </td>
+
+                                <td>
+                                    {{ p.get_method_display }}
+                                </td>
+
+                                <td>
+
+                                    {% if p.status == "confirmed" %}
+                                        <span class="badge bg-success">Confirmé</span>
+
+                                    {% elif p.status == "initiated" %}
+                                        <span class="badge bg-warning text-dark">
+                                            En attente
+                                        </span>
+
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            {{ p.get_status_display }}
+                                        </span>
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    Aucun paiement enregistré.
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- COLONNE PAIEMENT -->
+
+        <div class="col-lg-4">
+
+            {% if dues.balance > 0 %}
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    <strong>Payer une tranche</strong>
+                </div>
+
+                <div class="card-body">
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Montant</label>
+
+                            <input
+                                type="number"
+                                name="amount"
+                                class="form-control"
+                                min="1"
+                                max="{{ dues.balance }}"
+                                step="100"
+                                required
+                            >
+
+                            <small class="text-muted">
+                                Maximum : {{ dues.balance|intcomma }} {{ dues.fee.currency }}
+                            </small>
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Mode de paiement
+                            </label>
+
+                            <select name="method" class="form-select">
+
+                                <option value="mobile">
+                                    Mobile Money
+                                </option>
+
+                                <option value="bank">
+                                    Virement bancaire
+                                </option>
+
+                                <option value="cash">
+                                    Espèces
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <button class="btn btn-primary w-100">
+                            Enregistrer le paiement
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="alert alert-success">
+                Votre cotisation est entièrement réglée.
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
