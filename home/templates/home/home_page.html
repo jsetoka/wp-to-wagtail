@@ -1,21 +1,220 @@
 {% extends "base.html" %}
-{% load static %}
-
-{% block body_class %}template-homepage{% endblock %}
-
-{% block extra_css %}
-
-{% comment %}
-Delete the line below if you're just getting started and want to remove the welcome screen!
-{% endcomment %}
-<link rel="stylesheet" href="{% static 'css/welcome_page.css' %}">
-{% endblock extra_css %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
 {% block content %}
 
-{% comment %}
-Delete the line below if you're just getting started and want to remove the welcome screen!
-{% endcomment %}
+  {% with slides=page.hero_slides.all %}
+    {% if slides %}
+      <section class="hero" aria-label="Bannière principale">
+        <div class="hero-slider" role="region" aria-roledescription="carousel" aria-label="Slider">
+          {% for slide in slides %}
+            <article class="hero-slide" aria-label="Slide {{ forloop.counter }} sur {{ slides|length }}">
+              {% if slide.image %}
+                {% image slide.image fill-1600x650 as hero_img %}
+                <img
+                  src="{{ hero_img.url }}"
+                  width="{{ hero_img.width }}"
+                  height="{{ hero_img.height }}"
+                  alt="{{ slide.title|default:page.title }}"
+                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                >
+              {% endif %}
+
+              <div class="hero-overlay">
+                {% if slide.title %}<h1 class="hero-title">{{ slide.title }}</h1>{% endif %}
+                {% if slide.subtitle %}<p class="hero-subtitle">{{ slide.subtitle }}</p>{% endif %}
+
+                {% if slide.cta_page %}
+                  <a class="btn" href="{% pageurl slide.cta_page %}">
+                    {{ slide.cta_text|default:"En savoir plus" }}
+                  </a>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  {% endwith %}
+
+<div class="container my-4">
+  <div class="row g-4 align-items-start">
+
+    {# ===== COLONNE 8 : ARTICLES ===== #}
+    <div class="col-12 col-lg-8">
+
+      {% if page.show_latest_articles %}
+        <section class="latest-articles">
+          <div class="d-flex align-items-baseline justify-content-between mb-3">
+            <h2 class="h4 mb-0">{{ page.latest_articles_title|default:"Actualités" }}</h2>
+          </div>
+
+          {# Si tu veux 2 colonnes de cards dans la zone 8 #}
+          <div class="row g-3">
+            {% for p in latest_articles %}
+              <div class="col-12 col-md-6">
+                <article class="card h-100 shadow-sm border-0">
+                  <div class="card-body d-flex flex-column">
+
+                    {% if p.date %}
+                      <div class="text-muted small mb-2">
+                        <time datetime="{{ p.date|date:'Y-m-d' }}">{{ p.date|date:"d/m/Y" }}</time>
+                      </div>
+                    {% endif %}
+
+                    <h3 class="h6 card-title mb-2">{{ p.title }}</h3>
+
+                    {% if p.search_description %}
+                      <p class="card-text text-secondary mb-3">
+                        {{ p.search_description|truncatechars:160 }}
+                      </p>
+                    {% elif p.intro %}
+                      <div class="card-text text-secondary mb-3">
+                        {{ p.intro|richtext }}
+                      </div>
+                    {% endif %}
+
+                    <a class="mt-auto text-decoration-none fw-semibold" href="{% pageurl p %}">
+                      Lire l’article →
+                    </a>
+
+                  </div>
+                </article>
+              </div>
+            {% empty %}
+              <div class="col-12">
+                <div class="alert alert-light border mb-0">Aucun article pour le moment.</div>
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+    </div>
 
 
-{% endblock content %}
+    {# ===== COLONNE 4 : EDITORIAL ===== #}
+    <aside class="col-12 col-lg-4">
+
+      {% if page.editorial_title or page.tagline or page.editorial_body %}
+        <section class="editorial card border-0 shadow-sm">
+          <div class="card-body">
+            {% if page.editorial_title %}
+              <h2 class="h5 mb-3">{{ page.editorial_title }}</h2>
+            {% endif %}
+
+            {% if page.tagline %}
+              <blockquote class="blockquote small mb-3">
+                <p class="mb-0">{{ page.tagline }}</p>
+              </blockquote>
+            {% endif %}
+
+            {% if page.editorial_body %}
+              <div class="richtext">
+                {{ page.editorial_body|richtext }}
+              </div>
+            {% endif %}
+          </div>
+        </section>
+      {% endif %}
+
+    </aside>
+
+  </div>
+</div>
+
+
+  {% if page.spotlight_page %}
+    <section class="spotlight" aria-label="Mise en avant">
+      <div class="container">
+        <h2>{{ page.spotlight_title|default:"Un ingénieur, un impact" }}</h2>
+
+        <article class="spotlight-card">
+          <a class="card-link" href="{% pageurl page.spotlight_page %}">
+            <h3 class="card-title">{{ page.spotlight_page.title }}</h3>
+            {% if page.spotlight_page.search_description %}
+              <p class="excerpt">{{ page.spotlight_page.search_description|truncatechars:220 }}</p>
+            {% endif %}
+            <span class="btn btn-secondary">Découvrir</span>
+          </a>
+        </article>
+      </div>
+    </section>
+  {% endif %}
+
+
+
+  {% if page.perspectives_page %}
+    <section class="perspectives" aria-label="Regards d’ingénieurs">
+      <div class="container">
+        <h2>{{ page.perspectives_title|default:"Regards d’ingénieurs" }}</h2>
+
+        {% if page.perspectives_excerpt %}
+          <p class="lead">{{ page.perspectives_excerpt }}</p>
+        {% endif %}
+
+        <a class="btn" href="{% pageurl page.perspectives_page %}">Lire la suite</a>
+      </div>
+    </section>
+  {% endif %}
+
+
+  {% with cards=page.quick_links.all %}
+  {% if cards %}
+    <section class="quick-links py-5" aria-label="Accès rapides">
+      <div class="container">
+
+        <div class="row g-4">
+
+          {% for card in cards %}
+            <div class="col-12 col-md-6 col-lg-4">
+
+              <article class="card h-100 shadow-sm border-0">
+
+                {% if card.image %}
+                  {% image card.image fill-360x360 as qimg %}
+                  <img
+                    src="{{ qimg.url }}"
+                    width="{{ qimg.width }}"
+                    height="{{ qimg.height }}"
+                    class="card-img-top"
+                    alt="{{ card.title }}"
+                    loading="lazy"
+                  >
+                {% endif %}
+
+                <div class="card-body d-flex flex-column">
+
+                  <h3 class="h5 card-title">{{ card.title }}</h3>
+
+                  {% if card.text %}
+                    <p class="card-text text-muted">
+                      {{ card.text|truncatechars:160 }}
+                    </p>
+                  {% endif %}
+
+                  {% if card.link_page %}
+                    <a class="btn btn-primary mt-auto" href="{% pageurl card.link_page %}">
+                      Accéder
+                    </a>
+                  {% elif card.link_url %}
+                    <a class="btn btn-primary mt-auto" href="{{ card.link_url }}" target="_blank" rel="noopener">
+                      Accéder
+                    </a>
+                  {% endif %}
+
+                </div>
+
+              </article>
+
+            </div>
+          {% endfor %}
+
+        </div>
+
+      </div>
+    </section>
+  {% endif %}
+{% endwith %}
+
+{% endblock %}

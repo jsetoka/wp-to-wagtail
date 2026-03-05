@@ -112,5 +112,27 @@
   .wizard-step ul { list-style: none; padding-left: 0; }
   .wizard-step li { margin-bottom: .75rem; }
   .wizard-step input[type="radio"] { margin-right: .5rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .excerpt {
+    margin-top: auto;
+  }
   
   
