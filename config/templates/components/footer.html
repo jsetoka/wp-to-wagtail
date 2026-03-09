@@ -4,10 +4,10 @@
 {% get_settings use_default_site=True %}
 
 <footer>
-  {{ settings.home.FooterSettings.body|linebreaks }}
+  {{ settings.core.FooterSettings.body|linebreaks }}
 </footer>
 
-{% with f=settings.home.FooterSettings %}
+{% with f=settings.core.FooterSettings %}
 <footer class="{{ f.footer_bg_class }} {{ f.footer_text_class }} mt-auto py-4">
   <div class="container">
     <div class="row">

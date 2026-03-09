@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Pièces justificatives{% endblock %}
+
+{% block content %}
+<section class="py-3">
+  <div class="container-fluid px-0">
+    <div class="mx-auto" style="max-width: 1100px;">
+
+      <!-- Header -->
+      <header class="mb-4">
+        <p class="mb-1 small fw-semibold text-muted">
+          Dossier {{ application.reference }}
+        </p>
+        <h1 class="h2 fw-bold text-dark mb-2">
+          Pièces justificatives
+        </h1>
+        <p class="text-muted mb-0">
+          Déposez les documents requis pour compléter votre candidature.
+        </p>
+      </header>
+
+      <!-- Progression -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="small text-muted fw-semibold">Progression</span>
+          <span class="small fw-semibold text-dark">Étape {{ step }} / 6</span>
+        </div>
+
+        <div class="progress" style="height: 10px;">
+          <div class="progress-bar bg-dark" role="progressbar" style="width: 83%;"></div>
+        </div>
+
+        <div class="row g-2 small mt-3">
+          <div class="col-6 col-sm text-dark fw-semibold">1. Type</div>
+          <div class="col-6 col-sm text-dark fw-semibold">2. Identité</div>
+          <div class="col-6 col-sm text-dark fw-semibold">3. Coordonnées</div>
+          <div class="col-6 col-sm text-dark fw-semibold">4. Profession</div>
+          <div class="col-12 col-sm text-dark fw-semibold">5. Documents</div>
+        </div>
+      </section>
+
+      <!-- Messages -->
+      {% if messages %}
+        <div class="mb-4">
+          {% for message in messages %}
+            <div class="alert alert-secondary rounded-4 shadow-sm mb-2">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="row g-4">
+
+        <!-- Formulaire upload -->
+        <div class="col-12 col-lg-8">
+          <section class="bg-white rounded-4 shadow-sm border p-4 p-sm-5 h-100">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger rounded-4 mb-4">
+                  {{ form.non_field_errors }}
+                </div>
+              {% endif %}
+
+              <div class="mb-4">
+                <h2 class="h4 fw-bold text-dark mb-1">Ajouter un document</h2>
+                <p class="small text-muted mb-0">
+                  Formats autorisés : PDF, JPG, JPEG, PNG. Taille maximale : 10 Mo.
+                </p>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold text-dark">Type de document</label>
+                {{ form.document_type }}
+                {% if form.document_type.errors %}
+                  <div class="small text-danger mt-2">
+                    {{ form.document_type.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold text-dark">Fichier</label>
+
+                <div class="rounded-4 border border-2 border-secondary-subtle border-dashed bg-light p-5 text-center">
+                  <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-4 bg-dark text-white"
+                       style="width: 56px; height: 56px; font-size: 1.5rem;">
+                    ⬆
+                  </div>
+                  <p class="fw-semibold text-dark mb-1">Ajoutez un fichier</p>
+                  <p class="small text-muted mb-3">
+                    Sélectionnez un fichier depuis votre appareil
+                  </p>
+                  <div>{{ form.file }}</div>
+                </div>
+
+                {% if form.file.errors %}
+                  <div class="small text-danger mt-2">
+                    {{ form.file.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="rounded-4 bg-light p-3 small text-muted">
+                Après ajout, vous pourrez continuer vers la vérification finale du dossier.
+              </div>
+
+              <div class="mt-4 pt-4 border-top d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between gap-3">
+                <a href="{% url 'adhesions:application_step_professional' application.pk %}"
+                   class="btn btn-outline-secondary rounded-3 fw-semibold px-4 py-2">
+                  ← Retour
+                </a>
+
+                <div class="d-flex flex-column flex-sm-row gap-2">
+                  <button type="submit"
+                          class="btn btn-dark rounded-3 fw-semibold px-4 py-2">
+                    Enregistrer le document
+                  </button>
+                  <a href="{% url 'adhesions:application_review' application.pk %}"
+                     class="btn btn-success rounded-3 fw-semibold px-4 py-2">
+                    Continuer →
+                  </a>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+
+        <!-- Documents requis -->
+        <div class="col-12 col-lg-4">
+          <aside class="bg-white rounded-4 shadow-sm border p-4 h-100">
+            <h2 class="h5 fw-bold text-dark mb-3">Documents requis</h2>
+
+            <div class="d-flex flex-column gap-2">
+              {% for doc in required_documents %}
+                <div class="d-flex align-items-start justify-content-between gap-3 rounded-4 bg-light px-3 py-3">
+                  <span class="small text-dark">{{ doc }}</span>
+
+                  {% if doc in uploaded_document_types %}
+                    <span class="badge rounded-pill text-bg-success px-3 py-2">Ajouté</span>
+                  {% else %}
+                    <span class="badge rounded-pill text-bg-warning px-3 py-2">Attendu</span>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- Documents déposés -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 p-sm-5 mt-4">
+        <div class="mb-4 d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between gap-2">
+          <h2 class="h4 fw-bold text-dark mb-0">Documents déjà déposés</h2>
+          <span class="badge rounded-pill text-bg-light border text-dark px-3 py-2">
+            {{ documents|length }} document{{ documents|length|pluralize }}
+          </span>
+        </div>
+
+        {% if documents %}
+
+          <!-- Mobile -->
+          <div class="d-md-none">
+            <div class="d-flex flex-column gap-3">
+              {% for doc in documents %}
+                <article class="rounded-4 border bg-light p-3">
+                  <div class="mb-2">
+                    <div class="fw-semibold text-dark">{{ doc.get_document_type_display }}</div>
+                    <div class="small text-muted mt-1">
+                      {{ doc.original_filename|default:"Document téléchargé" }}
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <span class="badge rounded-pill text-bg-secondary px-3 py-2">
+                      {{ doc.get_status_display }}
+                    </span>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                      {% if doc.file %}
+                        <a href="{{ doc.file.url }}"
+                           target="_blank"
+                           class="btn btn-sm btn-outline-secondary rounded-3 fw-semibold">
+                          Voir
+                        </a>
+                      {% endif %}
+
+                      {% if can_delete_documents %}
+                        <form method="post"
+                              action="{% url 'adhesions:application_document_delete' application.pk doc.pk %}"
+                              onsubmit="return confirm('Supprimer ce document ?');">
+                          {% csrf_token %}
+                          <button type="submit"
+                                  class="btn btn-sm btn-outline-danger rounded-3 fw-semibold">
+                            Supprimer
+                          </button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Desktop -->
+          <div class="d-none d-md-block">
+            <div class="d-flex flex-column gap-3">
+              {% for doc in documents %}
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3 rounded-4 border p-3">
+                  <div>
+                    <div class="fw-semibold text-dark">{{ doc.get_document_type_display }}</div>
+                    <div class="small text-muted mt-1">
+                      {{ doc.original_filename|default:"Document téléchargé" }}
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge rounded-pill text-bg-secondary px-3 py-2">
+                      {{ doc.get_status_display }}
+                    </span>
+
+                    {% if doc.file %}
+                      <a href="{{ doc.file.url }}"
+                         target="_blank"
+                         class="btn btn-sm btn-outline-secondary rounded-3 fw-semibold">
+                        Voir
+                      </a>
+                    {% endif %}
+
+                    {% if can_delete_documents %}
+                      <form method="post"
+                            action="{% url 'adhesions:application_document_delete' application.pk doc.pk %}"
+                            onsubmit="return confirm('Supprimer ce document ?');">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="btn btn-sm btn-outline-danger rounded-3 fw-semibold">
+                          Supprimer
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+        {% else %}
+          <div class="rounded-4 bg-light p-4 small text-muted">
+            Aucun document n’a encore été déposé.
+          </div>
+        {% endif %}
+
+        <div class="mt-4 pt-4 border-top d-flex flex-column flex-sm-row justify-content-sm-between gap-3">
+          <a href="{% url 'adhesions:application_step_professional' application.pk %}"
+             class="btn btn-outline-secondary rounded-3 fw-semibold px-4 py-2">
+            ← Retour
+          </a>
+
+          <a href="{% url 'adhesions:application_review' application.pk %}"
+             class="btn btn-dark rounded-3 fw-semibold px-4 py-2">
+            Vérifier le dossier →
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -15,6 +15,7 @@ urlpatterns = [
     path("search/", search_views.search, name="search"),
     path("accounts/", include("allauth.urls")),
     path("me/", include("members.urls")),
+    path("adhesion/", include("adhesions.urls")),
 ]
 
 

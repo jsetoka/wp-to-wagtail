@@ -1,0 +1,15 @@
+/* Login brand – Wagtail 7 */
+.login-logo {
+  width: 220px;   /* adapte à ton image */
+  height: 60px;
+  background: url("/static/core/img/logo-kerasgo.png") center / contain no-repeat;
+}
+
+
+/* Cache le logo par défaut s’il est en <svg> ou <img> */
+.w-login__brand svg,
+.login-logo img,
+.login_logo svg,
+.login-logo img {
+  display: none !important;
+}

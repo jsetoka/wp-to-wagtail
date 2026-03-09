@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Démarrer une candidature{% endblock %}
+
+{% block content %}
+<section class="py-3">
+  <div class="container-fluid px-0">
+    <div class="mx-auto" style="max-width: 900px;">
+
+      <!-- Header -->
+      <div class="mb-4">
+        <p class="mb-1 small fw-semibold text-uppercase text-success">
+          Espace candidat
+        </p>
+        <h1 class="h2 fw-bold text-dark mb-2">
+          Formulaire d’adhésion
+        </h1>
+        <p class="text-muted mb-0">
+          Sélectionnez le type de candidature puis suivez les étapes pour compléter votre dossier.
+        </p>
+      </div>
+
+      <!-- Messages -->
+      {% if messages %}
+        <div class="mb-4">
+          {% for message in messages %}
+            <div class="alert alert-secondary rounded-4 shadow-sm mb-2">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Progression -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="small text-muted fw-semibold">Progression</span>
+          <span class="small fw-semibold text-dark">Étape {{ step }} / 6</span>
+        </div>
+
+        <div class="progress" style="height: 10px;">
+          <div class="progress-bar bg-dark" role="progressbar" style="width: 17%;"></div>
+        </div>
+
+        <p class="small text-muted mt-3 mb-0">
+          Choisissez votre type de candidature.
+        </p>
+      </section>
+
+      <!-- Formulaire -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 p-sm-5">
+        <form method="post">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger rounded-4 mb-4">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <div class="mb-4">
+            <h2 class="h4 fw-bold text-dark mb-1">Type de candidature</h2>
+            <p class="small text-muted mb-0">
+              Cliquez sur une carte pour sélectionner la catégorie correspondante.
+            </p>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="w-100">
+                <input
+                  type="radio"
+                  name="application_type"
+                  value="NATIONAL"
+                  class="btn-check"
+                  id="type-national"
+                  {% if form.application_type.value == "NATIONAL" %}checked{% endif %}
+                >
+                <div class="card h-100 border shadow-sm rounded-4 cursor-pointer">
+                  <div class="card-body">
+                    <div class="fs-3 mb-3">🇨🇬</div>
+                    <h3 class="h5 fw-bold text-dark">National</h3>
+                    <p class="text-muted small mb-3">
+                      Pour les candidats de nationalité congolaise déposant une demande d’adhésion individuelle.
+                    </p>
+                    <div class="fw-semibold text-dark small">
+                      Sélectionner →
+                    </div>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="w-100">
+                <input
+                  type="radio"
+                  name="application_type"
+                  value="FOREIGNER"
+                  class="btn-check"
+                  id="type-foreigner"
+                  {% if form.application_type.value == "FOREIGNER" %}checked{% endif %}
+                >
+                <div class="card h-100 border shadow-sm rounded-4 cursor-pointer">
+                  <div class="card-body">
+                    <div class="fs-3 mb-3">🌍</div>
+                    <h3 class="h5 fw-bold text-dark">Étranger</h3>
+                    <p class="text-muted small mb-3">
+                      Pour les candidats étrangers souhaitant déposer un dossier auprès de l’OIC.
+                    </p>
+                    <div class="fw-semibold text-dark small">
+                      Sélectionner →
+                    </div>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="w-100">
+                <input
+                  type="radio"
+                  name="application_type"
+                  value="COMPANY"
+                  class="btn-check"
+                  id="type-company"
+                  {% if form.application_type.value == "COMPANY" %}checked{% endif %}
+                >
+                <div class="card h-100 border shadow-sm rounded-4 cursor-pointer">
+                  <div class="card-body">
+                    <div class="fs-3 mb-3">🏢</div>
+                    <h3 class="h5 fw-bold text-dark">Entreprise</h3>
+                    <p class="text-muted small mb-3">
+                      Pour les sociétés, cabinets ou structures souhaitant soumettre une demande.
+                    </p>
+                    <div class="fw-semibold text-dark small">
+                      Sélectionner →
+                    </div>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {% if form.application_type.errors %}
+            <div class="mt-3 small text-danger">
+              {{ form.application_type.errors|striptags }}
+            </div>
+          {% endif %}
+
+          <div class="mt-4 pt-4 border-top d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between gap-3">
+            <p class="small text-muted mb-0">
+              Vous pourrez compléter les informations aux étapes suivantes.
+            </p>
+
+            <button
+              type="submit"
+              class="btn btn-dark rounded-3 fw-semibold px-4 py-2"
+            >
+              Commencer la candidature
+            </button>
+          </div>
+        </form>
+      </section>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .btn-check:checked + .card {
+    border-color: var(--bs-success) !important;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15) !important;
+    background-color: #f6fffb;
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+</style>
+{% endblock %}

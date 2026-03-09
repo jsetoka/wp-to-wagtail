@@ -12,10 +12,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = PROJECT_DIR.parent
-
+load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -25,6 +27,7 @@ BASE_DIR = PROJECT_DIR.parent
 
 INSTALLED_APPS = [
     "django.contrib.sites",
+    "core",
     "home",
     "search",
     "wagtail.contrib.forms",
@@ -51,9 +54,9 @@ INSTALLED_APPS = [
     "blog",
     "members",
     "bibliotheque",
+    "adhesions",
 
 
-    # allauth
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -96,12 +99,6 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 
 # Password validation
@@ -203,3 +200,13 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # ou "optional" en dev
+
+
+MTN_MOMO_BASE_URL = os.getenv("MTN_MOMO_BASE_URL", default="https://sandbox.momodeveloper.mtn.com")
+MTN_MOMO_COLLECTION_PRIMARY_KEY = os.getenv("MTN_MOMO_COLLECTION_PRIMARY_KEY", default="")
+MTN_MOMO_API_USER = os.getenv("MTN_MOMO_API_USER", default="")
+MTN_MOMO_API_KEY = os.getenv("MTN_MOMO_API_KEY", default="")
+MTN_MOMO_TARGET_ENV = os.getenv("MTN_MOMO_TARGET_ENV", default="sandbox")  # prod: valeur fournie par MTN Congo
+MTN_MOMO_CALLBACK_URL = os.getenv("MTN_MOMO_CALLBACK_URL", default="")
+MTN_MOMO_CURRENCY = os.getenv("MTN_MOMO_CURRENCY", default="XAF")
+print (MTN_MOMO_BASE_URL)

@@ -2,37 +2,82 @@
 {% load wagtailcore_tags %}
 
 {% block content %}
-  <h1>{{ page.title }}</h1>
 
-  {% if page.intro %}{{ page.intro|richtext }}{% endif %}
+<div class="container py-5">
 
-  <div class="downloads">
-    <table>
-      <thead>
-        <tr>
-          <th>Titre</th>
-          <th>Catégories</th>
-          <th>Date de mise à jour</th>
-          <th>Télécharger</th>
-          <th>Downloads</th>
-        </tr>
-      </thead>
+  <div class="mb-4">
+    <h1 class="fw-bold">{{ page.title }}</h1>
 
-      <tbody>
-        {% for item in page.items.all %}
-          <tr>
-            <td>{{ item.title }}</td>
-            <td>{% if item.category %}{{ item.category.title }}{% endif %}</td>
-            <td>{{ item.updated_at|date:"d F Y" }}</td>
-            <td>
-              {% if item.document %}
-                <a href="{{ page.url }}download/{{ item.id }}/">Télécharger</a>
-              {% endif %}
-            </td>
-            <td>{{ item.download_count }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% if page.intro %}
+      <div class="text-muted">
+        {{ page.intro|richtext }}
+      </div>
+    {% endif %}
   </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+
+      <div class="table-responsive">
+
+        <table class="table table-hover align-middle mb-0">
+
+          <thead class="table-light">
+            <tr>
+              <th>Titre</th>
+              <th>Catégorie</th>
+              <th>Mise à jour</th>
+              <th>Télécharger</th>
+              <th>Downloads</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for item in page.items.all %}
+            <tr>
+
+              <td class="fw-semibold">
+                {{ item.title }}
+              </td>
+
+              <td>
+                {% if item.category %}
+                  <span class="badge bg-primary">
+                    {{ item.category.title }}
+                  </span>
+                {% endif %}
+              </td>
+
+              <td class="text-muted">
+                {{ item.updated_at|date:"d M Y" }}
+              </td>
+
+              <td>
+                {% if item.document %}
+                  <a href="{{ page.url }}download/{{ item.id }}/"
+                     class="btn btn-sm btn-outline-primary">
+                    Télécharger
+                  </a>
+                {% endif %}
+              </td>
+
+              <td>
+                <span class="badge bg-secondary">
+                  {{ item.download_count }}
+                </span>
+              </td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
 {% endblock %}

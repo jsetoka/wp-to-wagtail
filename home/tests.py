@@ -1,4 +1,6 @@
-from home.models import HomePage
+from django import template
+from core.models import Menu, FooterText
+from members.models import UserMenuFragment
 
 from wagtail.models import Page, Site
 from wagtail.test.utils import WagtailPageTestCase

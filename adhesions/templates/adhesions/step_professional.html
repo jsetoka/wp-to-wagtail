@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Informations professionnelles{% endblock %}
+
+{% block content %}
+<section class="py-3">
+  <div class="container-fluid px-0">
+    <div class="mx-auto" style="max-width: 900px;">
+
+      <!-- Header -->
+      <div class="mb-4">
+        <p class="mb-1 small fw-semibold text-muted">
+          Dossier {{ application.reference }}
+        </p>
+
+        <h1 class="h2 fw-bold text-dark mb-2">
+          Informations professionnelles
+        </h1>
+
+        <p class="text-muted mb-0">
+          Complétez votre parcours et votre situation professionnelle actuelle.
+        </p>
+      </div>
+
+      <!-- Progression -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="small text-muted fw-semibold">Progression</span>
+          <span class="small fw-semibold text-dark">Étape {{ step }} / 6</span>
+        </div>
+
+        <div class="progress" style="height: 10px;">
+          <div class="progress-bar bg-dark" role="progressbar" style="width: 80%;"></div>
+        </div>
+
+        <div class="row g-2 small mt-3">
+          <div class="col-6 col-sm text-dark fw-semibold">1. Type</div>
+          <div class="col-6 col-sm text-dark fw-semibold">2. Identité</div>
+          <div class="col-6 col-sm text-dark fw-semibold">3. Coordonnées</div>
+          <div class="col-6 col-sm text-dark fw-semibold">4. Profession</div>
+          <div class="col-12 col-sm text-muted">5. Documents</div>
+        </div>
+      </section>
+
+      <!-- Formulaire -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 p-sm-5">
+        <form method="post">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger rounded-4 mb-4">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <div class="mb-4">
+            <h2 class="h4 fw-bold text-dark mb-1">Situation professionnelle</h2>
+            <p class="small text-muted mb-0">
+              Ces informations permettent d’évaluer votre domaine d’activité et votre expertise.
+            </p>
+          </div>
+
+          <div class="row g-4">
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold text-dark">
+                Profession
+              </label>
+              {{ form.profession }}
+              {% if form.profession.errors %}
+                <div class="small text-danger mt-2">
+                  {{ form.profession.errors|striptags }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold text-dark">
+                Spécialisation
+              </label>
+              {{ form.specialization }}
+              {% if form.specialization.errors %}
+                <div class="small text-danger mt-2">
+                  {{ form.specialization.errors|striptags }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold text-dark">
+                Employeur / Structure
+              </label>
+              {{ form.employer }}
+              {% if form.employer.errors %}
+                <div class="small text-danger mt-2">
+                  {{ form.employer.errors|striptags }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold text-dark">
+                Adresse professionnelle
+              </label>
+              {{ form.professional_address }}
+              {% if form.professional_address.errors %}
+                <div class="small text-danger mt-2">
+                  {{ form.professional_address.errors|striptags }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold text-dark">
+                Biographie / Présentation
+              </label>
+              {{ form.biography }}
+              {% if form.biography.errors %}
+                <div class="small text-danger mt-2">
+                  {{ form.biography.errors|striptags }}
+                </div>
+              {% endif %}
+            </div>
+
+          </div>
+
+          <div class="mt-4 rounded-4 bg-light p-3 small text-muted">
+            Décrivez brièvement votre expérience, votre domaine d’expertise et votre activité actuelle.
+          </div>
+
+          <div class="mt-4 pt-4 border-top d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between gap-3">
+
+            <a
+              href="{% url 'adhesions:application_step_contact' application.pk %}"
+              class="btn btn-outline-secondary rounded-3 fw-semibold px-4 py-2"
+            >
+              ← Retour
+            </a>
+
+            <button
+              type="submit"
+              class="btn btn-dark rounded-3 fw-semibold px-4 py-2"
+            >
+              Continuer →
+            </button>
+
+          </div>
+        </form>
+      </section>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

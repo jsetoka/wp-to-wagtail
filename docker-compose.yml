@@ -6,7 +6,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - media:/app/media
+      - ./media:/app/media
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.dev
       DATABASE_URL: postgres://wagtail:wagtail@db:5432/wagtail
@@ -15,6 +15,7 @@ services:
     command: bash -lc "cd /app && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
   db:
     image: postgres:16
+    container_name: postgres-db
     environment:
       POSTGRES_DB: wagtail
       POSTGRES_USER: wagtail
@@ -38,6 +39,6 @@ services:
 
 volumes:
   pgdata:
-  media:
-  staticfiles:
   pgadmin_data:
+
+  

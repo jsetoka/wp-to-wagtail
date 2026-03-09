@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Vérification du dossier{% endblock %}
+
+{% block content %}
+<section class="py-3">
+  <div class="container-fluid px-0">
+    <div class="mx-auto" style="max-width: 1100px;">
+
+      <!-- Header -->
+      <div class="mb-4">
+        <p class="mb-1 small fw-semibold text-muted">
+          Dossier {{ application.reference }}
+        </p>
+
+        <h1 class="h2 fw-bold text-dark mb-2">
+          Vérification du dossier
+        </h1>
+
+        <p class="text-muted mb-0">
+          Vérifiez les informations ci-dessous avant de soumettre votre candidature.
+        </p>
+      </div>
+
+      <!-- Progression -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="small text-muted fw-semibold">Progression</span>
+          <span class="small fw-semibold text-dark">Étape {{ step }} / 6</span>
+        </div>
+
+        <div class="progress" style="height: 10px;">
+          <div class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
+        </div>
+
+        <div class="row g-2 small mt-3">
+          <div class="col-6 col-sm text-dark fw-semibold">1. Type</div>
+          <div class="col-6 col-sm text-dark fw-semibold">2. Identité</div>
+          <div class="col-6 col-sm text-dark fw-semibold">3. Coordonnées</div>
+          <div class="col-6 col-sm text-dark fw-semibold">4. Profession</div>
+          <div class="col-12 col-sm text-dark fw-semibold">5. Documents</div>
+        </div>
+      </section>
+
+      <!-- Informations personnelles -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 mb-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-2 mb-4">
+          <h2 class="h5 fw-bold text-dark mb-0">Informations personnelles</h2>
+          <a href="{% url 'adhesions:application_step_personal' application.pk %}"
+             class="small fw-semibold text-primary text-decoration-none">
+            Modifier
+          </a>
+        </div>
+
+        <div class="row g-3 small text-dark">
+          <div class="col-12 col-md-6"><strong>Nom :</strong> {{ application.last_name|default:"—" }}</div>
+          <div class="col-12 col-md-6"><strong>Prénom :</strong> {{ application.first_name|default:"—" }}</div>
+          <div class="col-12 col-md-6"><strong>Date de naissance :</strong> {{ application.date_of_birth|default:"—" }}</div>
+          <div class="col-12 col-md-6"><strong>Lieu de naissance :</strong> {{ application.place_of_birth|default:"—" }}</div>
+          <div class="col-12 col-md-6"><strong>Sexe :</strong> {{ application.gender|default:"—" }}</div>
+          <div class="col-12 col-md-6"><strong>Nationalité :</strong> {{ application.nationality|default:"—" }}</div>
+        </div>
+      </section>
+
+      <!-- Coordonnées -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 mb-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-2 mb-4">
+          <h2 class="h5 fw-bold text-dark mb-0">Coordonnées</h2>
+          <a href="{% url 'adhesions:application_step_contact' application.pk %}"
+             class="small fw-semibold text-primary text-decoration-none">
+            Modifier
+          </a>
+        </div>
+
+        <div class="row g-3 small text-dark">
+          <div class="col-12 col-md-6"><strong>Téléphone :</strong> {{ application.phone|default:"—" }}</div>
+          <div class="col-12 col-md-6"><strong>Email :</strong> {{ application.email|default:"—" }}</div>
+          <div class="col-12"><strong>Adresse :</strong> {{ application.address|default:"—" }}</div>
+        </div>
+      </section>
+
+      <!-- Informations professionnelles -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 mb-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-2 mb-4">
+          <h2 class="h5 fw-bold text-dark mb-0">Informations professionnelles</h2>
+          <a href="{% url 'adhesions:application_step_professional' application.pk %}"
+             class="small fw-semibold text-primary text-decoration-none">
+            Modifier
+          </a>
+        </div>
+
+        <div class="row g-3 small text-dark">
+          <div class="col-12 col-md-6"><strong>Profession :</strong> {{ application.profession|default:"—" }}</div>
+          <div class="col-12 col-md-6"><strong>Spécialisation :</strong> {{ application.specialization|default:"—" }}</div>
+          <div class="col-12"><strong>Employeur :</strong> {{ application.employer|default:"—" }}</div>
+          <div class="col-12"><strong>Adresse professionnelle :</strong> {{ application.professional_address|default:"—" }}</div>
+          <div class="col-12"><strong>Biographie :</strong> {{ application.biography|default:"—" }}</div>
+        </div>
+      </section>
+
+      <!-- Documents -->
+      <section class="bg-white rounded-4 shadow-sm border p-4 mb-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-2 mb-4">
+          <h2 class="h5 fw-bold text-dark mb-0">Documents déposés</h2>
+          <a href="{% url 'adhesions:application_step_documents' application.pk %}"
+             class="small fw-semibold text-primary text-decoration-none">
+            Modifier
+          </a>
+        </div>
+
+        {% if documents %}
+          <div class="d-flex flex-column gap-3">
+            {% for doc in documents %}
+              <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-3 rounded-4 border px-3 py-3">
+                <div>
+                  <div class="fw-semibold text-dark">
+                    {{ doc.get_document_type_display }}
+                  </div>
+                  <div class="small text-muted mt-1">
+                    {{ doc.original_filename|default:"Document téléchargé" }}
+                  </div>
+                </div>
+
+                <div class="small fw-semibold text-success">
+                  ✓ Ajouté
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="small text-danger">
+            Aucun document n'a été ajouté.
+          </div>
+        {% endif %}
+      </section>
+
+      <!-- Confirmation -->
+      <section class="bg-white rounded-4 shadow-sm border p-4">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="rounded-4 bg-light p-4 small text-muted mb-4">
+            En soumettant ce dossier :
+            <ul class="mt-2 mb-0 ps-3">
+              <li>vous confirmez l’exactitude des informations fournies</li>
+              <li>vous autorisez l’OIC à examiner votre candidature</li>
+              <li>vous acceptez les règles de traitement des dossiers</li>
+            </ul>
+          </div>
+
+          <div class="pt-4 border-top d-flex flex-column flex-sm-row justify-content-sm-between gap-3">
+            <a href="{% url 'adhesions:application_step_documents' application.pk %}"
+               class="btn btn-outline-secondary rounded-3 fw-semibold px-4 py-2">
+              ← Retour
+            </a>
+
+            <button type="submit"
+                    class="btn btn-success rounded-3 fw-semibold px-4 py-2">
+              Soumettre la candidature
+            </button>
+          </div>
+        </form>
+      </section>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

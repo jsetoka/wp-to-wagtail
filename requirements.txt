@@ -9,3 +9,4 @@ python-dateutil
 requests>=2.31
 defusedxml>=0.7
 django-allauth>=0.60
+python-dotenv>=1.0
