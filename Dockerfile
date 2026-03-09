@@ -1,18 +1,26 @@
 FROM python:3.12-slim
 
-WORKDIR /app/config
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
+WORKDIR /app
+
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-    build-essential ca-certificates curl gcc \
+    build-essential gcc \
     libpq-dev libxml2-dev libxslt1-dev zlib1g-dev \
-    libffi-dev libssl-dev python3-dev \
+    libffi-dev libssl-dev \
  && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /app/requirements.txt
-RUN pip install --upgrade pip wheel setuptools \
- && pip install --no-cache-dir -r /app/requirements.txt
+COPY requirements.txt .
+RUN pip install --upgrade pip setuptools wheel \
+ && pip install --no-cache-dir -r requirements.txt
 
-CMD ["bash", "-lc", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+COPY . .
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["/entrypoint.sh"]

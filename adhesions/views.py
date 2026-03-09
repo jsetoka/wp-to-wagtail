@@ -10,6 +10,7 @@ from .choices import ApplicationStatus
 from .forms import (
     ApplicationDocumentForm,
     ApplicationStartForm,
+    AssignReviewerForm,
     ContactInfoForm,
     PersonalInfoForm,
     ProfessionalInfoForm,
@@ -297,70 +298,71 @@ class DashboardView(StaffRequiredMixin, View):
             "rejected": counts_by_status.get(ApplicationStatus.REJECTED.value, 0),
         }
 
+        from django.urls import reverse
         dashboard_cards = [
             {
                 "title": "Total dossiers",
                 "value": stats["total"],
                 "description": "Toutes les candidatures",
                 "icon": "📁",
-                "value_class": "text-slate-900",
-                "icon_class": "bg-slate-100 text-slate-700",
+                "icon_class": "bg-light text-dark",
+                "url": reverse("adhesions:admin_application_list"),
             },
             {
                 "title": "Brouillons",
                 "value": stats["draft"],
                 "description": "Dossiers non soumis",
                 "icon": "✍️",
-                "value_class": "text-slate-700",
-                "icon_class": "bg-slate-100 text-slate-700",
+                "icon_class": "bg-light text-dark",
+                "url": f'{reverse("adhesions:admin_application_list")}?status={ApplicationStatus.DRAFT}',
             },
             {
                 "title": "Soumis",
                 "value": stats["submitted"],
                 "description": "En attente de traitement",
                 "icon": "📨",
-                "value_class": "text-blue-600",
-                "icon_class": "bg-blue-50 text-blue-700",
+                "icon_class": "bg-primary-subtle text-primary",
+                "url": f'{reverse("adhesions:admin_application_list")}?status={ApplicationStatus.SUBMITTED}',
             },
             {
                 "title": "Incomplets",
                 "value": stats["incomplete"],
                 "description": "À compléter",
                 "icon": "🧾",
-                "value_class": "text-sky-600",
-                "icon_class": "bg-sky-50 text-sky-700",
+                "icon_class": "bg-info-subtle text-info",
+                "url": f'{reverse("adhesions:admin_application_list")}?status={ApplicationStatus.INCOMPLETE}',
             },
             {
                 "title": "En vérification",
                 "value": stats["under_review"],
                 "description": "Analyse administrative",
                 "icon": "🔎",
-                "value_class": "text-amber-600",
-                "icon_class": "bg-amber-50 text-amber-700",
+                "icon_class": "bg-warning-subtle text-warning",
+                "url": f'{reverse("adhesions:admin_application_list")}?status={ApplicationStatus.UNDER_REVIEW}',
             },
             {
                 "title": "En commission",
                 "value": stats["pending_commission"],
                 "description": "Soumis à décision",
                 "icon": "🏛️",
-                "value_class": "text-orange-600",
-                "icon_class": "bg-orange-50 text-orange-700",
+                "icon_class": "bg-warning-subtle text-warning",
+                "url": f'{reverse("adhesions:admin_application_list")}?status={ApplicationStatus.PENDING_COMMISSION}',
             },
             {
                 "title": "Approuvés",
                 "value": stats["approved"],
                 "description": "Dossiers validés",
                 "icon": "✅",
-                "value_class": "text-emerald-600",
-                "icon_class": "bg-emerald-50 text-emerald-700",
+                "icon_class": "bg-success-subtle text-success",
+                "url": f'{reverse("adhesions:admin_application_list")}?status={ApplicationStatus.APPROVED}',
             },
             {
                 "title": "Rejetés",
                 "value": stats["rejected"],
                 "description": "Dossiers refusés",
                 "icon": "⛔",
-                "value_class": "text-rose-600",
-                "icon_class": "bg-rose-50 text-rose-700",
+                "icon_class": "bg-danger-subtle text-danger",
+                "url": f'{reverse("adhesions:admin_application_list")}?status={ApplicationStatus.REJECTED}',
             },
         ]
 
@@ -431,12 +433,17 @@ class ApplicationDetailView(StaffRequiredMixin, View):
         else:
             history = application.applicationstatushistory_set.select_related("changed_by").order_by("-id")
 
+
+        assign_form = AssignReviewerForm(
+            initial={"assigned_to": application.assigned_to}
+        )
         return render(
             request,
             self.template_name,
             {
                 "application": application,
                 "allowed_transitions": allowed_transitions,
+                "assign_form": assign_form,
                 "history": history,
             },
         )
@@ -492,3 +499,29 @@ class MyApplicationsView(CandidateRequiredMixin, View):
             },
         )
     
+@login_required
+def admin_application_assign(request, pk):
+    if not request.user.is_staff:
+        raise PermissionDenied
+
+    application = get_object_or_404(Application, pk=pk)
+
+    if request.method != "POST":
+        return redirect("adhesions:admin_application_detail", pk=application.pk)
+
+    form = AssignReviewerForm(request.POST)
+
+    if form.is_valid():
+        reviewer = form.cleaned_data["assigned_to"]
+        application.assigned_to = reviewer
+        application.save(update_fields=["assigned_to"])
+
+        if reviewer:
+            messages.success(request, f"Dossier assigné à {reviewer}.")
+        else:
+            messages.success(request, "Assignation retirée.")
+
+    else:
+        messages.error(request, "Impossible d’enregistrer l’assignation.")
+
+    return redirect("adhesions:admin_application_detail", pk=application.pk)

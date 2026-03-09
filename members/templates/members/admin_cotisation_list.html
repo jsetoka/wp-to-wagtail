@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Récapitulatif des cotisations{% endblock %}
+
+{% block content %}
+<section class="py-3">
+  <div class="container-fluid px-0">
+
+    <div class="mb-4 d-flex flex-column flex-xl-row align-items-xl-center justify-content-xl-between gap-3">
+      <div>
+        <p class="mb-1 small fw-semibold text-uppercase text-success">
+          Administration
+        </p>
+        <h1 class="h2 fw-bold text-dark mb-2">
+          Récapitulatif des cotisations
+        </h1>
+        <p class="text-muted mb-0">
+          Vue d’ensemble des cotisations de tous les membres.
+        </p>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'adhesions:admin_dashboard' %}"
+           class="btn btn-outline-secondary rounded-3 px-3 py-2 fw-semibold">
+          Retour au dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <section class="bg-white rounded-4 shadow-sm border p-4 mb-4">
+      <form method="get" class="row g-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label small fw-semibold text-uppercase text-muted">Recherche</label>
+          <input
+            type="text"
+            name="q"
+            value="{{ search_query }}"
+            class="form-control rounded-3"
+            placeholder="Nom d'utilisateur..."
+          >
+        </div>
+
+        <div class="col-12 col-md-3">
+          <label class="form-label small fw-semibold text-uppercase text-muted">Année</label>
+          <select name="year" class="form-select rounded-3">
+            <option value="">Toutes les années</option>
+            {% for y in years %}
+              <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>
+                {{ y }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-12 col-md-3">
+          <label class="form-label small fw-semibold text-uppercase text-muted">Statut</label>
+          <select name="status" class="form-select rounded-3">
+            <option value="">Tous les statuts</option>
+            {% for value, label in status_choices %}
+              <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-12 col-md-2 d-flex align-items-end gap-2">
+          <button type="submit" class="btn btn-dark rounded-3 fw-semibold w-100">
+            Filtrer
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Résumé -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-4">
+        <div class="bg-white rounded-4 shadow-sm border p-4 h-100">
+          <p class="small text-muted mb-2">Montant total dû</p>
+          <div class="display-6 fw-bold text-dark">
+            {{ summary.total_due|floatformat:0|intcomma }}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <div class="bg-white rounded-4 shadow-sm border p-4 h-100">
+          <p class="small text-muted mb-2">Montant total payé</p>
+          <div class="display-6 fw-bold text-success">
+            {{ summary.total_paid|floatformat:0|intcomma }}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <div class="bg-white rounded-4 shadow-sm border p-4 h-100">
+          <p class="small text-muted mb-2">Reste à recouvrer</p>
+          <div class="display-6 fw-bold text-danger">
+            {{ summary.total_balance|floatformat:0|intcomma }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tableau -->
+    <section class="bg-white rounded-4 shadow-sm border overflow-hidden">
+      <div class="border-bottom px-4 py-3">
+        <h2 class="h5 fw-bold text-dark mb-1">Liste des cotisations</h2>
+        <p class="small text-muted mb-0">Toutes les cotisations enregistrées.</p>
+      </div>
+
+      {% if dues %}
+        <div class="d-none d-md-block table-responsive">
+          <table class="table align-middle mb-0">
+            <thead class="table-light">
+              <tr class="text-uppercase small text-muted">
+                <th class="px-4 py-3">Membre</th>
+                <th class="px-4 py-3">Année</th>
+                <th class="px-4 py-3 text-end">Montant dû</th>
+                <th class="px-4 py-3 text-end">Payé</th>
+                <th class="px-4 py-3 text-end">Reste</th>
+                <th class="px-4 py-3">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in dues %}
+                <tr>
+                  <td class="px-4 py-3 fw-semibold text-dark">
+                    {{ d.member }}
+                  </td>
+                  <td class="px-4 py-3 text-dark">
+                    {{ d.fee.year }}
+                  </td>
+                  <td class="px-4 py-3 text-end text-dark">
+                    {{ d.amount_due|floatformat:0|intcomma }} {{ d.fee.currency }}
+                  </td>
+                  <td class="px-4 py-3 text-end text-success">
+                    {{ d.amount_paid|floatformat:0|intcomma }} {{ d.fee.currency }}
+                  </td>
+                  <td class="px-4 py-3 text-end text-danger">
+                    {{ d.balance|floatformat:0|intcomma }} {{ d.fee.currency }}
+                  </td>
+                  <td class="px-4 py-3">
+                    {% if d.status == "paid" %}
+                      <span class="badge rounded-pill text-bg-success px-3 py-2">Payé</span>
+                    {% elif d.status == "partial" %}
+                      <span class="badge rounded-pill text-bg-warning px-3 py-2">Partiel</span>
+                    {% else %}
+                      <span class="badge rounded-pill text-bg-secondary px-3 py-2">À payer</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-md-none p-3">
+          <div class="d-flex flex-column gap-3">
+            {% for d in dues %}
+              <article class="rounded-4 border bg-light p-3 shadow-sm">
+                <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+                  <div>
+                    <div class="fw-bold text-dark">{{ d.member }}</div>
+                    <div class="small text-muted">Année {{ d.fee.year }}</div>
+                  </div>
+
+                  {% if d.status == "paid" %}
+                    <span class="badge rounded-pill text-bg-success px-3 py-2">Payé</span>
+                  {% elif d.status == "partial" %}
+                    <span class="badge rounded-pill text-bg-warning px-3 py-2">Partiel</span>
+                  {% else %}
+                    <span class="badge rounded-pill text-bg-secondary px-3 py-2">À payer</span>
+                  {% endif %}
+                </div>
+
+                <div class="row g-2 small">
+                  <div class="col-4">
+                    <div class="text-muted">Dû</div>
+                    <div class="fw-semibold">{{ d.amount_due|floatformat:0|intcomma }}</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-muted">Payé</div>
+                    <div class="fw-semibold text-success">{{ d.amount_paid|floatformat:0|intcomma }}</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-muted">Reste</div>
+                    <div class="fw-semibold text-danger">{{ d.balance|floatformat:0|intcomma }}</div>
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <div class="px-4 py-5 text-center">
+          <div class="mb-3 fs-2">💳</div>
+          <h3 class="h5 fw-bold text-dark">Aucune cotisation trouvée</h3>
+          <p class="text-muted mb-0">
+            Aucun résultat ne correspond aux filtres sélectionnés.
+          </p>
+        </div>
+      {% endif %}
+    </section>
+
+  </div>
+</section>
+{% endblock %}

@@ -24,6 +24,7 @@ urlpatterns += [
     path("admin/dashboard/", views.DashboardView.as_view(), name="admin_dashboard"),
     path("admin/dossiers/", views.ApplicationListView.as_view(), name="admin_application_list"),
     path("admin/dossiers/<int:pk>/", views.ApplicationDetailView.as_view(), name="admin_application_detail"),
+    path("admin/dossiers/<int:pk>/assign/",views.admin_application_assign, name="admin_application_assign"),
     path("mes-candidatures/", views.MyApplicationsView.as_view(), name="my_applications"),
 
 ]

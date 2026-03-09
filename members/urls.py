@@ -11,4 +11,7 @@ urlpatterns = [
     path("dues/<int:year>/", dues_detail, name="dues_detail"),
     #path("payments/momo/callback/", momo_callback, name="momo_callback"),
     path("payments/<int:payment_id>/check/", check_momo_payment, name="check_momo_payment"),
+
+    path("admin/cotisations/", views.admin_cotisation_list, name="admin_cotisation_list"),
+
 ]

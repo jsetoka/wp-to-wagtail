@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DB_HOST="localhost"
+DB_PORT="5432"
+DB_NAME="oic_db_restore"
+DB_USER="oic_user"
+DUMP_FILE="$1"
+
+export PGPASSWORD="mot_de_passe"
+
+dropdb --if-exists -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DB_NAME"
+createdb -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DB_NAME"
+
+pg_restore \
+  -h "$DB_HOST" \
+  -p "$DB_PORT" \
+  -U "$DB_USER" \
+  -d "$DB_NAME" \
+  --clean \
+  --if-exists \
+  "$DUMP_FILE"
+
+echo "Restauration terminée dans $DB_NAME"

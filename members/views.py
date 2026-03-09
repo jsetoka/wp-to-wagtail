@@ -1,6 +1,6 @@
 # members/views.py
 from decimal import Decimal, InvalidOperation
-
+from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
@@ -8,12 +8,16 @@ from django.shortcuts import render, get_object_or_404, redirect
 from members.models import MemberAnnualDues, AnnualFee, Payment
 from members.services import MtnMomoClient, MtnMomoError
 
+from django.core.exceptions import PermissionDenied
 
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.db.models import Sum, F, Value, DecimalField
+from django.db.models.functions import Coalesce
 
-from .models import MemberAnnualDues, MemberProfile
+from members.models import Member
+
+
+
+from .models import MemberProfile
 
 
 @login_required
@@ -127,3 +131,73 @@ def dues_detail(request, year: int):
         "members/dues_detail.html",
         {"dues": dues, "payments": payments}
     )
+
+
+@login_required
+def admin_cotisation_list(request):
+    if not request.user.is_staff:
+        raise PermissionDenied
+
+    qs = (
+        MemberAnnualDues.objects
+        .select_related("member", "fee", "member__user")
+        .order_by("-fee__year", "member__user__username")
+    )
+
+    year = request.GET.get("year", "").strip()
+    status = request.GET.get("status", "").strip()
+    q = request.GET.get("q", "").strip()
+
+    if year:
+        try:
+            year = int(year)
+            qs = qs.filter(fee__year=year)
+        except (TypeError, ValueError):
+            year = None
+
+    if status in {"due", "partial", "paid"}:
+        qs = qs.filter(status=status)
+
+    if q:
+        qs = qs.filter(
+            Q(member__user__username__icontains=q) |
+            Q(member__user__first_name__icontains=q) |
+            Q(member__user__last_name__icontains=q) |
+            Q(member__user__email__icontains=q) |
+            Q(member__member_no__icontains=q)
+        )
+
+    total_due = qs.aggregate(
+        total=Coalesce(Sum("amount_due"), Value(0), output_field=DecimalField(max_digits=12, decimal_places=2))
+    )["total"]
+
+    total_paid = sum((due.amount_paid for due in qs), Decimal("0"))
+    total_balance = sum((due.balance for due in qs), Decimal("0"))
+
+    summary = {
+        "total_due": total_due,
+        "total_paid": total_paid,
+        "total_balance": total_balance,
+    }
+
+    years = (
+        MemberAnnualDues.objects
+        .values_list("fee__year", flat=True)
+        .distinct()
+        .order_by("-fee__year")
+    )
+
+    context = {
+        "dues": qs,
+        "years": years,
+        "selected_year": year,
+        "selected_status": status,
+        "search_query": q,
+        "summary": summary,
+        "status_choices": [
+            ("due", "À payer"),
+            ("partial", "Partiel"),
+            ("paid", "Payé"),
+        ],
+    }
+    return render(request, "members/admin_cotisation_list.html", context)

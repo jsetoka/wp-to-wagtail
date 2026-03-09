@@ -22,6 +22,8 @@ services:
       POSTGRES_PASSWORD: wagtail
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+    - "5432:5432"
 
 
   pgadmin:
@@ -41,4 +43,4 @@ volumes:
   pgdata:
   pgadmin_data:
 
-  
+

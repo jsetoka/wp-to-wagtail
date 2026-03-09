@@ -2,8 +2,8 @@
 
 from django import forms
 from .models import Application, ApplicationDocument
-from .choices import ApplicationType, DocumentType
-
+from .choices import ApplicationType, DocumentType, OICGroup
+from django.contrib.auth import get_user_model
 
 class ApplicationStartForm(forms.Form):
     application_type = forms.ChoiceField(choices=ApplicationType.choices)
@@ -133,3 +133,27 @@ class ApplicationDocumentForm(forms.ModelForm):
         if file.size > 10 * 1024 * 1024:
             raise forms.ValidationError("Le fichier dépasse 10 Mo.")
         return file
+    
+
+
+User = get_user_model()
+
+
+class AssignReviewerForm(forms.Form):
+    assigned_to = forms.ModelChoiceField(
+        queryset=User.objects.none(),
+        required=False,
+        label="Reviewer",
+        empty_label="Non assigné",
+        widget=forms.Select(attrs={"class": "form-select rounded-3"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        reviewers = User.objects.filter(
+            is_active=True,
+            groups__name=OICGroup.REVIEWER,
+        ).distinct().order_by("username")
+
+        self.fields["assigned_to"].queryset = reviewers

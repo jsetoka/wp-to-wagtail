@@ -209,4 +209,3 @@ MTN_MOMO_API_KEY = os.getenv("MTN_MOMO_API_KEY", default="")
 MTN_MOMO_TARGET_ENV = os.getenv("MTN_MOMO_TARGET_ENV", default="sandbox")  # prod: valeur fournie par MTN Congo
 MTN_MOMO_CALLBACK_URL = os.getenv("MTN_MOMO_CALLBACK_URL", default="")
 MTN_MOMO_CURRENCY = os.getenv("MTN_MOMO_CURRENCY", default="XAF")
-print (MTN_MOMO_BASE_URL)
