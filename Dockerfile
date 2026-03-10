@@ -10,7 +10,14 @@ RUN apt-get update \
     build-essential gcc \
     libpq-dev libxml2-dev libxslt1-dev zlib1g-dev \
     libffi-dev libssl-dev \
- && rm -rf /var/lib/apt/lists/*
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf-2.0-0 \
+    shared-mime-info \
+    fonts-dejavu-core \
+    fonts-liberation \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --upgrade pip setuptools wheel \
@@ -23,4 +30,4 @@ RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
 
-ENTRYPOINT ["/entrypoint.sh"]
+# ENTRYPOINT ["/entrypoint.sh"]

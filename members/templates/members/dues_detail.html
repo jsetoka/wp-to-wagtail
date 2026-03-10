@@ -166,6 +166,13 @@
                         </a>
                       </div>
                     {% endif %}
+                    {% if p.status == "confirmed" %}
+                      <a href="{% url 'payment_invoice_pdf' p.id %}"
+                        target="_blank"
+                        class="btn btn-sm btn-outline-secondary rounded-3 fw-semibold">
+                        Télécharger la facture
+                      </a>
+                    {% endif %}
                   </article>
                 {% endfor %}
               </div>
@@ -227,6 +234,13 @@
                           <a href="{% url 'check_momo_payment' p.id %}"
                              class="btn btn-sm btn-outline-primary rounded-3 fw-semibold">
                             Vérifier
+                          </a>
+                        {% endif %}
+                        {% if p.status == "confirmed" %}
+                          <a href="{% url 'payment_invoice_pdf' p.id %}"
+                            target="_blank"
+                            class="btn btn-sm btn-outline-secondary rounded-3 fw-semibold">
+                            Facture
                           </a>
                         {% endif %}
                       </td>

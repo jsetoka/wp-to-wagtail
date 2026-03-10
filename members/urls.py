@@ -13,5 +13,7 @@ urlpatterns = [
     path("payments/<int:payment_id>/check/", check_momo_payment, name="check_momo_payment"),
 
     path("admin/cotisations/", views.admin_cotisation_list, name="admin_cotisation_list"),
-
+    #path("payments/<int:payment_id>/invoice/", views.payment_invoice, name="payment_invoice"),
+    path("payments/<int:payment_id>/invoice.pdf", views.payment_invoice_pdf, name="payment_invoice_pdf"),
+    path("verify-invoice/", views.verify_invoice, name="verify_invoice"),
 ]

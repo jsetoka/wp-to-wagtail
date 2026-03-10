@@ -10,3 +10,6 @@ requests>=2.31
 defusedxml>=0.7
 django-allauth>=0.60
 python-dotenv>=1.0
+weasyprint
+gunicorn>=23.0.0,<26
+qrcode[pil]

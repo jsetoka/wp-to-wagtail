@@ -119,15 +119,8 @@
                           </li>
                         {% endif %}
                       {% endfor %}
-                    {% else %}
-                      <li><a class="dropdown-item py-2" href="/me/cotisations/">Mes cotisations</a></li>
-                      {% if user.is_staff %}
-                        <li><a class="dropdown-item py-2" href="/admin/">Administration</a></li>
-                      {% endif %}
                     {% endif %}
-
                     <li><hr class="dropdown-divider"></li>
-
                     <li>
                       <form method="post" action="{% url 'account_logout' %}" class="px-2 py-1">
                         {% csrf_token %}
@@ -150,7 +143,7 @@
           </div>
 
           <div class="offcanvas offcanvas-start text-bg-dark d-lg-none"
-               tabindex="-1" id="mainOffcanvas" aria-labelledby="mainOffcanvasLabel">
+              tabindex="-1" id="mainOffcanvas" aria-labelledby="mainOffcanvasLabel">
             <div class="offcanvas-header border-bottom border-white border-opacity-10">
               <div>
                 <h5 class="offcanvas-title mb-0" id="mainOffcanvasLabel">Menu</h5>
@@ -161,25 +154,55 @@
             </div>
 
             <div class="offcanvas-body">
+
+              {% if user.is_authenticated %}
+                {% get_user_menu_fragment "default" as user_menu %}
+              {% endif %}
+
               <div class="p-3 rounded-3 bg-white bg-opacity-10 mb-3">
                 {% if user.is_authenticated %}
-                  <div class="d-flex align-items-center gap-2">
+                  <div class="d-flex align-items-center gap-2 mb-3">
                     <div class="rounded-circle bg-white bg-opacity-10 d-flex align-items-center justify-content-center"
-                         style="width:36px;height:36px;">
+                        style="width:36px;height:36px;">
                       <span class="fw-semibold">{{ user.username|slice:":1"|upper }}</span>
                     </div>
                     <div>
-                      <div class="fw-semibold">{{ user.username }}</div>
-                      <div class="small text-white text-opacity-75">Compte connecté</div>
+                      <div class="fw-semibold">
+                        {{ user.get_full_name|default:user.username }}
+                      </div>
+                      <div class="small text-white text-opacity-75">
+                        Espace utilisateur
+                      </div>
                     </div>
                   </div>
+
+                  {% if user_menu and user_menu.items.all %}
+                    <ul class="list-unstyled mb-0">
+                      {% for link in user_menu.items.all %}
+                        {% if not link.only_staff or user.is_staff %}
+                          <li class="mb-2">
+                            <a class="btn btn-sm btn-outline-light w-100 text-start"
+                              href="{{ link.url }}"
+                              {% if link.open_in_new_tab %}target="_blank" rel="noopener"{% endif %}>
+                              {{ link.label }}
+                            </a>
+                          </li>
+                        {% endif %}
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+
                 {% else %}
                   <div class="d-flex align-items-center justify-content-between">
                     <div>
                       <div class="fw-semibold">Bienvenue</div>
-                      <div class="small text-white text-opacity-75">Connecte-toi pour accéder aux espaces privés</div>
+                      <div class="small text-white text-opacity-75">
+                        Connecte-toi pour accéder aux espaces privés
+                      </div>
                     </div>
-                    <a class="btn btn-sm btn-outline-info" href="{% url 'account_login' %}">Connexion</a>
+                    <a class="btn btn-sm btn-outline-info" href="{% url 'account_login' %}">
+                      Connexion
+                    </a>
                   </div>
                 {% endif %}
               </div>
@@ -203,7 +226,9 @@
                     </li>
                   {% else %}
                     <li class="nav-item">
-                      <a class="nav-link" href="{{ item.url|default:'#' }}">{{ item.title }}</a>
+                      <a class="nav-link" href="{{ item.url|default:'#' }}">
+                        {{ item.title }}
+                      </a>
                     </li>
                   {% endif %}
                 {% endfor %}
