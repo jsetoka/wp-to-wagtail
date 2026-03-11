@@ -16,7 +16,7 @@ except ImportError:
 
 SECRET_KEY = "django-insecure-dasg7+r=9_z6enw*ipvv@nz)$_b^likl*)-738q0+v(vn#5-6f"
 
-ALLOWED_HOSTS = ["51.255.196.187"]
+ALLOWED_HOSTS = ["51.255.196.187", "oic.kerenes-digital.com"]
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 DATABASES = {

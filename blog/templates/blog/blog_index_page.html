@@ -2,171 +2,199 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
 {% block content %}
+<section class="py-5 bg-light">
+  <div class="container">
 
-<section class="container py-5">
+    <header class="mb-5 text-center text-lg-start">
+      <span class="badge rounded-pill text-bg-primary-subtle text-primary px-3 py-2 mb-3">
+        Blog
+      </span>
+      <h1 class="display-5 fw-bold mb-3">{{ page.title|default:"Articles" }}</h1>
 
-  {# Titre / intro #}
-  <header class="mb-4">
-    <h1 class="fw-bold mb-2">{{ page.title|default:"Articles" }}</h1>
+      {% if page.intro %}
+        <div class="lead text-secondary mx-auto mx-lg-0" style="max-width: 760px;">
+          {{ page.intro|richtext }}
+        </div>
+      {% endif %}
+    </header>
 
-    {% if page.intro %}
-      <div class="text-muted lead">
-        {{ page.intro|richtext }}
-      </div>
-    {% endif %}
-  </header>
+    <div class="row g-4 align-items-start">
 
-  <div class="row g-4">
+      <div class="col-12 col-xl-8">
 
-    {# COLONNE PRINCIPALE : liste des posts #}
-    <div class="col-12 col-lg-8">
+        {% with posts=posts|default:page.get_children.live.public.specific %}
+          {% for post in posts %}
+            <article class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-md-row gap-4">
 
-      {% with posts=posts|default:page.get_children.live.public.specific %}
-        {% for post in posts %}
+                  {% if post.image %}
+                    <a href="{{ post.url }}" class="flex-shrink-0 text-decoration-none">
+                      <div class="rounded-4 overflow-hidden bg-body-secondary" style="width: 140px; height: 140px;">
+                        {% image post.image fill-140x140 class="w-100 h-100 object-fit-cover" %}
+                      </div>
+                    </a>
+                  {% endif %}
 
-          <article class="mb-3 d-flex gap-3">
-            {% if post.image %}
-              {% image post.image fill-120x120 class="rounded flex-shrink-0" %}
-            {% endif %}
-            <div>
-              {# Titre #}
-              <h2 class="h4 fw-bold mb-2">
-                <a class="text-decoration-none" href="{{ post.url }}">
-                  {{ post.title }}
-                </a>
-              </h2>
-              {# Métadonnées (auteur / catégories / commentaires) #}
-              <ul class="list-inline text-muted small mb-2">
-                <li class="list-inline-item">• par {{ post.owner|default:"admin" }}</li>
+                  <div class="flex-grow-1 min-w-0">
+                    <div class="d-flex flex-wrap gap-2 mb-3 small">
+                      <span class="badge rounded-pill text-bg-light border text-secondary">
+                        Par {{ post.owner|default:"admin" }}
+                      </span>
 
-                {% if post.categories.all %}
-                  <li class="list-inline-item">•</li>
-                  <li class="list-inline-item">
-                    {% for cat in post.categories.all %}
-                      {{ cat }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                  </li>
-                {% endif %}
+                      {% if post.date %}
+                        <span class="badge rounded-pill text-bg-light border text-secondary">
+                          {{ post.date }}
+                        </span>
+                      {% endif %}
 
-                {% if post.comment_count %}
-                  <li class="list-inline-item">•</li>
-                  <li class="list-inline-item">{{ post.comment_count }} commentaire{{ post.comment_count|pluralize }}</li>
-                {% endif %}
+                      {% if post.comment_count %}
+                        <span class="badge rounded-pill text-bg-light border text-secondary">
+                          {{ post.comment_count }} commentaire{{ post.comment_count|pluralize }}
+                        </span>
+                      {% endif %}
+                    </div>
 
-                {% if post.date %}
-                  <li class="list-inline-item">•</li>
-                  <li class="list-inline-item">{{ post.date }}</li>
-                {% endif %}
-              </ul>
+                    <h2 class="h3 fw-bold mb-3">
+                      <a class="text-decoration-none text-dark stretched-link position-relative" href="{{ post.url }}">
+                        {{ post.title }}
+                      </a>
+                    </h2>
 
-              {# Extrait #}
-              <div class="text-muted">
-                {% if post.search_description %}
-                  {{ post.search_description }}
-                {% elif post.intro %}
-                  {{ post.intro|richtext }}
-                {% elif post.body %}
-                  {# fallback : si tu as un body riche, affiche une version courte #}
-                  {{ post.body|richtext }}
-                {% endif %}
+                    {% if post.categories.all %}
+                      <div class="mb-3">
+                        {% for cat in post.categories.all %}
+                          <span class="badge rounded-pill text-bg-primary-subtle text-primary me-1 mb-1">
+                            {{ cat }}
+                          </span>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+
+                    <div class="text-secondary mb-3">
+                      {% if post.search_description %}
+                        {{ post.search_description }}
+                      {% elif post.intro %}
+                        {{ post.intro|richtext }}
+                      {% elif post.body %}
+                        {{ post.body|richtext }}
+                      {% endif %}
+                    </div>
+
+                    <div>
+                      <a class="btn btn-outline-primary btn-sm rounded-pill px-3" href="{{ post.url }}">
+                        Lire la suite
+                      </a>
+                    </div>
+                  </div>
+
+                </div>
               </div>
-
-              <div class="mt-2">
-                <a class="text-decoration-none fw-semibold" href="{{ post.url }}">Lire la suite »</a>
+            </article>
+          {% empty %}
+            <div class="card border-0 shadow-sm rounded-4">
+              <div class="card-body p-4 text-center">
+                <h2 class="h5 fw-semibold mb-2">Aucun article pour le moment</h2>
+                <p class="text-secondary mb-0">Revenez bientôt pour découvrir les prochaines publications.</p>
               </div>
             </div>
-          </article>
+          {% endfor %}
+        {% endwith %}
 
-        {% empty %}
-          <div class="alert alert-secondary">
-            Aucun article pour le moment.
+        {% if page_obj %}
+          <nav aria-label="Pagination" class="mt-4">
+            <ul class="pagination pagination-lg justify-content-center justify-content-lg-start mb-0">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link rounded-pill me-2" href="?page={{ page_obj.previous_page_number }}">
+                    ← Précédent
+                  </a>
+                </li>
+              {% endif %}
+
+              <li class="page-item disabled">
+                <span class="page-link rounded-pill">
+                  Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                </span>
+              </li>
+
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link rounded-pill ms-2" href="?page={{ page_obj.next_page_number }}">
+                    Suivant →
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        {% endif %}
+
+      </div>
+
+      <aside class="col-12 col-xl-4">
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h3 class="h5 fw-bold mb-0">Actualités</h3>
+              <span class="badge rounded-pill text-bg-primary-subtle text-primary">Récentes</span>
+            </div>
+
+            {% if recent_posts %}
+              <div class="d-flex flex-column gap-3">
+                {% for p in recent_posts %}
+                  <a href="{{ p.url }}" class="text-decoration-none text-reset">
+                    <div class="d-flex gap-3 align-items-start p-2 rounded-4 hover-bg-light">
+                      {% if p.image %}
+                        <div class="flex-shrink-0 rounded-3 overflow-hidden bg-body-secondary" style="width: 72px; height: 72px;">
+                          {% image p.image fill-72x72 class="w-100 h-100 object-fit-cover" %}
+                        </div>
+                      {% endif %}
+                      <div class="min-w-0">
+                        <div class="fw-semibold text-dark mb-1">{{ p.title }}</div>
+                        {% if p.date %}
+                          <div class="small text-secondary">{{ p.date }}</div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </a>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-secondary small mb-0">Pas d’actualités pour le moment.</p>
+            {% endif %}
           </div>
-        {% endfor %}
-      {% endwith %}
+        </div>
 
-      {# Pagination (si tu fournis page_obj/paginator dans le contexte) #}
-      {% if page_obj %}
-        <nav aria-label="Pagination" class="mt-4">
-          <ul class="pagination">
-            {% if page_obj.has_previous %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
-              </li>
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h3 class="h5 fw-bold mb-0">Commentaires récents</h3>
+              <span class="badge rounded-pill text-bg-light border text-secondary">Communauté</span>
+            </div>
+
+            {% if recent_comments %}
+              <div class="list-group list-group-flush">
+                {% for c in recent_comments %}
+                  <div class="list-group-item px-0 py-3 border-0 border-bottom bg-transparent">
+                    <div class="small text-secondary mb-1">
+                      <span class="fw-semibold text-dark">{{ c.user_name }}</span> a commenté
+                    </div>
+                    <a class="text-decoration-none fw-medium" href="{{ c.post_url }}">
+                      {{ c.post_title }}
+                    </a>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-secondary small mb-0">Aucun commentaire récent.</p>
             {% endif %}
+          </div>
+        </div>
 
-            <li class="page-item disabled">
-              <span class="page-link">
-                Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-              </span>
-            </li>
-
-            {% if page_obj.has_next %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant »</a>
-              </li>
-            {% endif %}
-          </ul>
-        </nav>
-      {% endif %}
+      </aside>
 
     </div>
-
-    {# SIDEBAR : “Actualités” + “Commentaires récents” #}
-    <aside class="col-12 col-lg-4">
-
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-          <h3 class="h6 fw-bold mb-3">Actualités</h3>
-
-          {% if recent_posts %}
-            <ul class="list-unstyled mb-0">
-              {% for p in recent_posts %}
-                <li class="d-flex gap-3 mb-3">
-                  {% if p.image %}
-                    <div style="width:64px;height:64px" class="flex-shrink-0">
-                      {% image p.image fill-64x64 class="rounded w-100 h-100" %}
-                    </div>
-                  {% endif %}
-                  <div class="min-w-0">
-                    <a class="text-decoration-none fw-semibold d-block text-truncate" href="{{ p.url }}">
-                      {{ p.title }}
-                    </a>
-                    {% if p.date %}
-                      <div class="text-muted small">{{ p.date }}</div>
-                    {% endif %}
-                  </div>
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <div class="text-muted small">Pas d’actualités pour le moment.</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <h3 class="h6 fw-bold mb-3">Commentaires récents</h3>
-
-          {% if recent_comments %}
-            <ol class="mb-0 ps-3">
-              {% for c in recent_comments %}
-                <li class="mb-2">
-                  <span class="fw-semibold">{{ c.user_name }}</span>
-                  <span class="text-muted">sur</span>
-                  <a class="text-decoration-none" href="{{ c.post_url }}">{{ c.post_title }}</a>
-                </li>
-              {% endfor %}
-            </ol>
-          {% else %}
-            <div class="text-muted small">Aucun commentaire récent.</div>
-          {% endif %}
-        </div>
-      </div>
-
-    </aside>
-
   </div>
 </section>
-
 {% endblock %}

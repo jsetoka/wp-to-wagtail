@@ -8,6 +8,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: unless-stopped
+    networks:
+      - oic_internal
 
   web:
     build: .
@@ -22,7 +24,6 @@ services:
       EMAIL_HOST_USER: ${EMAIL_HOST_USER}
       EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
-
     depends_on:
       - db
     volumes:
@@ -31,31 +32,18 @@ services:
     expose:
       - "8000"
     restart: unless-stopped
-
-  nginx:
-    image: nginx:1.25-alpine
-    depends_on:
-      - web
-    ports:
-      - "8080:80"
-      - "8443:443"
-    volumes:
-      - ./nginx/default_prod.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./certbot/www:/var/www/certbot:ro
-      - letsencrypt:/etc/letsencrypt:ro
-      - media:/app/media:ro
-      - staticfiles:/app/staticfiles:ro
-    restart: unless-stopped
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./certbot/www:/var/www/certbot
-      - letsencrypt:/etc/letsencrypt
-    restart: "no"
+    networks:
+      oic_internal:
+      webproxy:
+        aliases:
+          - oic-web
 
 volumes:
   pgdata:
   media:
   staticfiles:
-  letsencrypt:
+
+networks:
+  oic_internal:
+  webproxy:
+    external: true

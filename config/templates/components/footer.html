@@ -1,70 +1,91 @@
 {% load wagtailcore_tags %}
-
 {% load wagtailsettings_tags %}
 {% get_settings use_default_site=True %}
 
-<footer>
-  {{ settings.core.FooterSettings.body|linebreaks }}
-</footer>
-
 {% with f=settings.core.FooterSettings %}
-<footer class="{{ f.footer_bg_class }} {{ f.footer_text_class }} mt-auto py-4">
+<footer class="{{ f.footer_bg_class|default:'bg-dark' }} {{ f.footer_text_class|default:'text-light' }} mt-auto pt-5 pb-4 border-top">
   <div class="container">
-    <div class="row">
+    <div class="row g-4">
 
-      <!-- Colonne 1 -->
-      <div class="col-md-4 mb-3">
-        <h5>{{ f.about_title }}</h5>
-        <div class="small">
+      <div class="col-12 col-md-6 col-lg-4">
+        <h5 class="fw-bold mb-3">{{ f.about_title|default:"À propos" }}</h5>
+        <div class="small opacity-75">
           {{ f.about_text|richtext }}
         </div>
       </div>
 
-      <!-- Colonne 2 -->
-      <div class="col-md-4 mb-3">
-        <h5>{{ f.links_title }}</h5>
-        <ul class="list-unstyled">
+      <div class="col-12 col-md-6 col-lg-4">
+        <h5 class="fw-bold mb-3">{{ f.links_title|default:"Liens utiles" }}</h5>
+        <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
           {% for item in f.links %}
             {% with it=item.value %}
               <li>
                 {% if it.page %}
-                  <a href="{{ it.page.url }}" class="text-light text-decoration-none">{{ it.label }}</a>
+                  <a href="{{ it.page.url }}" class="link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover">
+                    {{ it.label }}
+                  </a>
                 {% elif it.url %}
-                  <a href="{{ it.url }}" class="text-light text-decoration-none">{{ it.label }}</a>
+                  <a href="{{ it.url }}" class="link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover">
+                    {{ it.label }}
+                  </a>
                 {% else %}
-                  <span class="text-muted">{{ it.label }}</span>
+                  <span class="text-white-50">{{ it.label }}</span>
                 {% endif %}
               </li>
             {% endwith %}
           {% empty %}
-            <li><a href="/a-propos/" class="text-light text-decoration-none">À propos</a></li>
-            <li><a href="/articles/" class="text-light text-decoration-none">Blog</a></li>
-            <li><a href="/contact/" class="text-light text-decoration-none">Contact</a></li>
+            <li>
+              <a href="/a-propos/" class="link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover">À propos</a>
+            </li>
+            <li>
+              <a href="/articles/" class="link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover">Blog</a>
+            </li>
+            <li>
+              <a href="/contact/" class="link-light link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover">Contact</a>
+            </li>
           {% endfor %}
         </ul>
       </div>
 
-      <!-- Colonne 3 -->
-      <div class="col-md-4 mb-3">
-        <h5>{{ f.social_title }}</h5>
-        {% for s in f.socials %}
-          {% with so=s.value %}
-            <a href="{{ so.url }}" class="text-light me-2">
-              {% if so.icon_class %}<i class="{{ so.icon_class }}"></i>{% endif %} {{ so.label }}
-            </a><br/>
-          {% endwith %}
-        {% empty %}
-          <a href="#" class="text-light me-2"><i class="bi bi-facebook"></i> Facebook</a><br/>
-          <a href="#" class="text-light me-2"><i class="bi bi-twitter"></i> Twitter</a><br/>
-          <a href="#" class="text-light"><i class="bi bi-linkedin"></i> LinkedIn</a>
-        {% endfor %}
+      <div class="col-12 col-lg-4">
+        <h5 class="fw-bold mb-3">{{ f.social_title|default:"Réseaux sociaux" }}</h5>
+
+        <div class="d-flex flex-column gap-2">
+          {% for s in f.socials %}
+            {% with so=s.value %}
+              <a href="{{ so.url }}" class="btn btn-outline-light btn-sm rounded-pill text-start">
+                {% if so.icon_class %}
+                  <i class="{{ so.icon_class }} me-2"></i>
+                {% endif %}
+                {{ so.label }}
+              </a>
+            {% endwith %}
+          {% empty %}
+            <a href="#" class="btn btn-outline-light btn-sm rounded-pill text-start">
+              <i class="bi bi-facebook me-2"></i> Facebook
+            </a>
+            <a href="#" class="btn btn-outline-light btn-sm rounded-pill text-start">
+              <i class="bi bi-twitter me-2"></i> Twitter
+            </a>
+            <a href="#" class="btn btn-outline-light btn-sm rounded-pill text-start">
+              <i class="bi bi-linkedin me-2"></i> LinkedIn
+            </a>
+          {% endfor %}
+        </div>
       </div>
+
     </div>
 
-    <div class="text-center mt-3 border-top pt-3">
-      <small>© {{ now|date:"Y" }} Kerene's Digital — Tous droits réservés.</small>
+    <hr class="border-light border-opacity-25 my-4">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 small text-white-50">
+      <div>
+        © {% now "Y" %} Kerene's Digital — Tous droits réservés.
+      </div>
+      <div>
+        {{ settings.core.FooterSettings.body|linebreaks }}
+      </div>
     </div>
   </div>
 </footer>
-
 {% endwith %}

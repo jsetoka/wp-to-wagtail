@@ -1,129 +1,130 @@
 {% load user_menu_fragment %}
 
 {% if menu %}
-<nav>
-  <ul>
-    {# MENU PRINCIPAL #}
-    {% for item in menu.items.all %}
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-3">
+  <div class="container">
 
-      {% if item.visibility == "all" %}
-        <li>
-          <a href="{{ item.url }}">{{ item.title }}</a>
+    <a class="navbar-brand fw-bold" href="/">
+      {{ site.site_name|default:"Mon site" }}
+    </a>
 
-          {% if item.show_children %}
-            {% if item.children.all %}
-              <ul>
-                {% for child in item.children.all %}
-                  <li><a href="{{ child.url }}">{{ child.title }}</a></li>
-                {% endfor %}
-              </ul>
-            {% elif item.link_page %}
-              {% with kids=item.link_page.get_children.live.in_menu %}
-                {% if kids %}
-                  <ul>
-                    {% for p in kids %}
-                      <li><a href="{{ p.url }}">{{ p.title }}</a></li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              {% endwith %}
-            {% endif %}
-          {% endif %}
-        </li>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar" aria-expanded="false" aria-label="Basculer la navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      {% elif item.visibility == "auth" and request.user.is_authenticated %}
-        <li>
-          <a href="{{ item.url }}">{{ item.title }}</a>
+    <div class="collapse navbar-collapse" id="mainNavbar">
 
-          {% if item.show_children %}
-            {% if item.children.all %}
-              <ul>
-                {% for child in item.children.all %}
-                  <li><a href="{{ child.url }}">{{ child.title }}</a></li>
-                {% endfor %}
-              </ul>
-            {% elif item.link_page %}
-              {% with kids=item.link_page.get_children.live.in_menu %}
-                {% if kids %}
-                  <ul>
-                    {% for p in kids %}
-                      <li><a href="{{ p.url }}">{{ p.title }}</a></li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              {% endwith %}
-            {% endif %}
-          {% endif %}
-        </li>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-      {% elif item.visibility == "anon" and not request.user.is_authenticated %}
-        <li>
-          <a href="{{ item.url }}">{{ item.title }}</a>
+        {% for item in menu.items.all %}
+          {% if item.visibility == "all" or item.visibility == "auth" and request.user.is_authenticated or item.visibility == "anon" and not request.user.is_authenticated %}
 
-          {% if item.show_children %}
-            {% if item.children.all %}
-              <ul>
-                {% for child in item.children.all %}
-                  <li><a href="{{ child.url }}">{{ child.title }}</a></li>
-                {% endfor %}
-              </ul>
-            {% elif item.link_page %}
-              {% with kids=item.link_page.get_children.live.in_menu %}
-                {% if kids %}
-                  <ul>
-                    {% for p in kids %}
-                      <li><a href="{{ p.url }}">{{ p.title }}</a></li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              {% endwith %}
-            {% endif %}
-          {% endif %}
-        </li>
-      {% endif %}
-
-    {% endfor %}
-
-    {# ===== ZONE UTILISATEUR (FRAGMENT) ===== #}
-    {% if request.user.is_authenticated %}
-      {% get_user_menu_fragment "default" as user_menu %}
-
-      <li class="user-menu">
-        <span class="user-label">
-          {{ request.user.get_full_name|default:request.user.username }}
-        </span>
-
-        {% if user_menu %}
-          <ul class="user-menu__dropdown">
-            {% for link in user_menu.items.all %}
-              {% if not link.only_staff or request.user.is_staff %}
-                <li>
-                  <a href="{{ link.url }}"
-                     {% if link.open_in_new_tab %}target="_blank" rel="noopener"{% endif %}>
-                    {{ link.label }}
+            {% if item.show_children %}
+              {% if item.children.all %}
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="{{ item.url }}" id="menu-{{ forloop.counter }}"
+                     role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ item.title }}
                   </a>
+                  <ul class="dropdown-menu rounded-3 shadow border-0" aria-labelledby="menu-{{ forloop.counter }}">
+                    {% for child in item.children.all %}
+                      <li>
+                        <a class="dropdown-item" href="{{ child.url }}">{{ child.title }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+
+              {% elif item.link_page %}
+                {% with kids=item.link_page.get_children.live.in_menu %}
+                  {% if kids %}
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="{{ item.url }}" id="menu-{{ forloop.counter }}"
+                         role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ item.title }}
+                      </a>
+                      <ul class="dropdown-menu rounded-3 shadow border-0" aria-labelledby="menu-{{ forloop.counter }}">
+                        {% for p in kids %}
+                          <li>
+                            <a class="dropdown-item" href="{{ p.url }}">{{ p.title }}</a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% else %}
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ item.url }}">{{ item.title }}</a>
+                    </li>
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ item.url }}">{{ item.title }}</a>
                 </li>
               {% endif %}
-            {% endfor %}
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ item.url }}">{{ item.title }}</a>
+              </li>
+            {% endif %}
 
-            <li><hr></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
 
-            <li>
-              <form method="post" action="{% url 'account_logout' %}">
-                {% csrf_token %}
-                <button type="submit">Déconnexion</button>
-              </form>
-            </li>
-          </ul>
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+
+        {% if request.user.is_authenticated %}
+          {% get_user_menu_fragment "default" as user_menu %}
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#"
+               id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">
+                {{ request.user.get_full_name|default:request.user.username }}
+              </span>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end rounded-3 shadow border-0 mt-2" aria-labelledby="userDropdown">
+              {% if user_menu %}
+                {% for link in user_menu.items.all %}
+                  {% if not link.only_staff or request.user.is_staff %}
+                    <li>
+                      <a class="dropdown-item"
+                         href="{{ link.url }}"
+                         {% if link.open_in_new_tab %}target="_blank" rel="noopener"{% endif %}>
+                        {{ link.label }}
+                      </a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+
+              <li><hr class="dropdown-divider"></li>
+
+              <li>
+                <form method="post" action="{% url 'account_logout' %}" class="px-3 py-1">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill">
+                    Déconnexion
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </li>
+
+        {% else %}
+          <li class="nav-item">
+            <a href="{% url 'account_login' %}" class="btn btn-primary rounded-pill px-4 ms-lg-3">
+              Connexion
+            </a>
+          </li>
         {% endif %}
-      </li>
 
-    {% else %}
-      <li class="user-menu">
-        <a href="{% url 'account_login' %}">Connexion</a>
-      </li>
-    {% endif %}
+      </ul>
 
-  </ul>
+    </div>
+  </div>
 </nav>
 {% endif %}

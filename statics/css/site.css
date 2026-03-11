@@ -30,7 +30,7 @@
     width: 100%;
     height: 100%;
     background-color: #2563EB; 
-    background: url("/static/images/logo-kd.png") no-repeat center center;
+    background: url("/static/images/logo_OIC.png") no-repeat center center;
     background-size: 100%;   /* ajuste la taille */
     opacity: 0.1;            /* transparence */
     z-index: -1;              /* reste derrière le contenu */
