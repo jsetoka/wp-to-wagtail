@@ -166,6 +166,14 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 # Wagtail settings
 
 WAGTAIL_SITE_NAME = "config"
+ACCOUNT_ADAPTER = "members.adapters.CustomAccountAdapter"
+ACCOUNT_LOGIN_METHODS = {"email", "username"}
+ACCOUNT_SIGNUP_FIELDS = [
+    "username*",
+    "email*",
+    "password1*",
+    "password2*",
+]
 
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html

@@ -393,7 +393,7 @@
                 <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between gap-2">
                   <div>
                     <div class="fw-semibold text-dark">
-                      {{ item.old_status }} → {{ item.new_status }}
+                      {{ item.get_old_status_display }} → {{ item.get_new_status_display }}
                     </div>
                     <div class="small text-muted">
                       {{ item.created_at|date:"d/m/Y H:i" }}

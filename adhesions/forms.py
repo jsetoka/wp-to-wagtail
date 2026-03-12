@@ -29,17 +29,19 @@ class PersonalInfoForm(forms.ModelForm):
                 "class": "block w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-slate-900 focus:outline-none focus:ring-0",
                 "placeholder": "Entrez le nom",
             }),
-            "date_of_birth": forms.DateInput(attrs={
-                "class": "block w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-0",
-                "type": "date",
-            }),
+            "date_of_birth": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={
+                    "class": "block w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-0",
+                    "type": "date",
+                },
+            ),
             "place_of_birth": forms.TextInput(attrs={
                 "class": "block w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-slate-900 focus:outline-none focus:ring-0",
                 "placeholder": "Ville ou localité de naissance",
             }),
-            "gender": forms.TextInput(attrs={
-                "class": "block w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-slate-900 focus:outline-none focus:ring-0",
-                "placeholder": "Ex. Masculin / Féminin",
+            "gender": forms.Select(attrs={
+                "class": "block w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:outline-none focus:ring-0",
             }),
             "nationality": forms.TextInput(attrs={
                 "class": "block w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-slate-900 focus:outline-none focus:ring-0",

@@ -67,6 +67,12 @@ class CandidateProfile(TimeStampedModel):
         return f"{self.last_name} {self.first_name}"
 
 
+
+
+GENDER_CHOICES = [
+    ("M", "Masculin"),
+    ("F", "Féminin"),
+]
 class Application(TimeStampedModel):
     reference = models.CharField(max_length=30, unique=True, editable=False)
     candidate = models.ForeignKey(
@@ -90,7 +96,11 @@ class Application(TimeStampedModel):
     last_name = models.CharField(max_length=150)
     date_of_birth = models.DateField(null=True, blank=True)
     place_of_birth = models.CharField(max_length=255, blank=True)
-    gender = models.CharField(max_length=20, blank=True)
+    gender = models.CharField(
+        max_length=1,
+        choices=GENDER_CHOICES,
+        verbose_name="Genre"
+    )
     nationality = models.CharField(max_length=100, blank=True)
 
     # coordonnées

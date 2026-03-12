@@ -29,20 +29,46 @@ from .permissions import (
 from .workflows import transition_application
 
 
+ACTIVE_APPLICATION_STATUSES = [
+    ApplicationStatus.DRAFT,
+    ApplicationStatus.INCOMPLETE,
+    ApplicationStatus.SUBMITTED,
+    ApplicationStatus.UNDER_REVIEW,
+    ApplicationStatus.PENDING_COMMISSION,
+]
+
+
 @login_required
 def application_start(request):
     if request.method == "POST":
         form = ApplicationStartForm(request.POST)
         if form.is_valid():
-            profile, _created = CandidateProfile.objects.get_or_create(
-                user=request.user
-            )
+            profile, _created = CandidateProfile.objects.get_or_create(user=request.user)
+
+            application_type = form.cleaned_data["application_type"]
+
+            existing_application = Application.objects.filter(
+                candidate=profile,
+                application_type=application_type,
+                status__in=ACTIVE_APPLICATION_STATUSES,
+            ).order_by("-created_at").first()
+
+            if existing_application:
+                messages.warning(
+                    request,
+                    "Vous avez déjà une demande en cours pour ce type d’adhésion."
+                )
+                return redirect(
+                    "adhesions:application_step_personal",
+                    pk=existing_application.pk,
+                )
 
             application = Application.objects.create(
                 candidate=profile,
-                application_type=form.cleaned_data["application_type"],
+                application_type=application_type,
             )
 
+            messages.success(request, "Votre nouveau dossier a été créé.")
             return redirect("adhesions:application_step_personal", pk=application.pk)
     else:
         form = ApplicationStartForm()
@@ -58,10 +84,44 @@ def application_step_personal(request, pk):
         candidate__user=request.user,
     )
 
+
+
+    if request.method == "POST":
+        print("POST date_of_birth =", request.POST.get("date_of_birth"))
+        form = PersonalInfoForm(request.POST, instance=application)
+        print("is_valid =", form.is_valid())
+        print("errors =", form.errors)
+
+        if form.is_valid():
+            application = form.save()
+            print("saved date_of_birth =", application.date_of_birth)
+
+
+    print ("APPLI", application.date_of_birth)
     if request.method == "POST":
         form = PersonalInfoForm(request.POST, instance=application)
+
+
+
         if form.is_valid():
-            form.save()
+            application = form.save()
+
+            candidate_profile = get_object_or_404(
+                CandidateProfile,
+                user=request.user,
+            )
+
+            candidate_profile.last_name = application.last_name
+            candidate_profile.first_name = application.first_name
+            candidate_profile.gender = application.gender
+            candidate_profile.date_of_birth = application.date_of_birth
+            candidate_profile.place_of_birth = application.place_of_birth
+            candidate_profile.nationality = application.nationality
+
+
+            print ("JOJO3", application.date_of_birth, candidate_profile.date_of_birth )
+            candidate_profile.save()
+
             return redirect("adhesions:application_step_contact", pk=application.pk)
     else:
         form = PersonalInfoForm(instance=application)
@@ -88,7 +148,16 @@ def application_step_contact(request, pk):
     if request.method == "POST":
         form = ContactInfoForm(request.POST, instance=application)
         if form.is_valid():
-            form.save()
+            application = form.save()
+
+            candidate_profile = get_object_or_404(
+                CandidateProfile,
+                user=request.user,
+            )
+            candidate_profile.address = application.address
+            candidate_profile.phone = application.phone
+            candidate_profile.email = application.email
+            candidate_profile.save()
             return redirect("adhesions:application_step_professional", pk=application.pk)
     else:
         form = ContactInfoForm(instance=application)
