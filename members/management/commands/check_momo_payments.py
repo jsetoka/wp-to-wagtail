@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from members.models import Payment
-from members.services import MtnMomoClient
+from payment.services import MtnMomoClient
 
 
 class Command(BaseCommand):

@@ -27,8 +27,8 @@ services:
     depends_on:
       - db
     volumes:
-      - media:/app/media
-      - staticfiles:/app/staticfiles
+      - /home/ubuntu/apps/oic/media:/app/media
+      - /home/ubuntu/apps/oic/staticfiles:/app/staticfiles
     expose:
       - "8000"
     restart: unless-stopped
@@ -37,6 +37,7 @@ services:
       webproxy:
         aliases:
           - oic-web
+
 
 volumes:
   pgdata:

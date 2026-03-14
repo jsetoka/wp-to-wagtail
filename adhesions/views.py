@@ -15,7 +15,7 @@ from .forms import (
     PersonalInfoForm,
     ProfessionalInfoForm,
 )
-from .mixins import CandidateRequiredMixin, StaffRequiredMixin
+from .mixins import CandidateRequiredMixin, OICStaffRequiredMixin, StaffRequiredMixin
 from .models import Application, ApplicationDocument, CandidateProfile
 from .permissions import (
     can_view_application,
@@ -87,17 +87,13 @@ def application_step_personal(request, pk):
 
 
     if request.method == "POST":
-        print("POST date_of_birth =", request.POST.get("date_of_birth"))
+
         form = PersonalInfoForm(request.POST, instance=application)
-        print("is_valid =", form.is_valid())
-        print("errors =", form.errors)
 
         if form.is_valid():
             application = form.save()
-            print("saved date_of_birth =", application.date_of_birth)
 
 
-    print ("APPLI", application.date_of_birth)
     if request.method == "POST":
         form = PersonalInfoForm(request.POST, instance=application)
 
@@ -118,8 +114,6 @@ def application_step_personal(request, pk):
             candidate_profile.place_of_birth = application.place_of_birth
             candidate_profile.nationality = application.nationality
 
-
-            print ("JOJO3", application.date_of_birth, candidate_profile.date_of_birth )
             candidate_profile.save()
 
             return redirect("adhesions:application_step_contact", pk=application.pk)
@@ -453,7 +447,7 @@ class DashboardView(StaffRequiredMixin, View):
 
 
 
-class ApplicationListView(StaffRequiredMixin, View):
+class ApplicationListView(OICStaffRequiredMixin, View):
     template_name = "adhesions/application_list.html"
 
     def get(self, request):
@@ -483,7 +477,7 @@ class ApplicationListView(StaffRequiredMixin, View):
         return render(request, self.template_name, {"applications": qs})
 
 
-class ApplicationDetailView(StaffRequiredMixin, View):
+class ApplicationDetailView(OICStaffRequiredMixin, View):
     template_name = "adhesions/application_detail.html"
 
     def get(self, request, pk):

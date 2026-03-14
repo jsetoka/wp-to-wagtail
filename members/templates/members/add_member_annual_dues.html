@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter une cotisation annuelle{% endblock %}
+
+{% block content %}
+<div class="container-sm py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h4 class="mb-0">Ajouter une cotisation annuelle</h4>
+                </div>
+
+                <div class="card-body">
+
+                    <p class="mb-4">
+                        <strong>Membre :</strong>
+                        {{ member.member_no }} —
+                        {{ member.user.get_full_name|default:member.user.username }}
+                    </p>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            {{ form.fee.label_tag }}
+                            {{ form.fee }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.status.label_tag }}
+                            {{ form.status }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.amount_due.label_tag }}
+                            {{ form.amount_due }}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                Ajouter la cotisation
+                            </button>
+
+                            <a href="{% url 'members:admin_cotisation_list' %}" class="btn btn-secondary">
+                                Retour
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}  

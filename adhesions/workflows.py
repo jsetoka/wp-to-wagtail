@@ -1,8 +1,11 @@
+import uuid
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from members.models import AnnualFee, MemberAnnualDues, MemberProfile
+
 from .choices import ApplicationStatus
-from .models import ApplicationStatusHistory
+from .models import ApplicationStatusHistory, CandidateProfile
 from .permissions import can_transition_application
 from .transitions import ALLOWED_TRANSITIONS
 
@@ -38,7 +41,29 @@ def transition_application(application, new_status, changed_by=None, comment="")
         ApplicationStatus.REJECTED,
     ]:
         application.reviewed_at = timezone.now()
+    
+    if new_status == ApplicationStatus.APPROVED:
+        user = application.candidate.user
+        member_profile, created = MemberProfile.objects.get_or_create(
+            user=user,
+            defaults={
+                "member_no": MemberProfile.generate_member_no(),
+                "is_active_member": True,
+            }
+        )
 
+        current_year = timezone.now().year
+        annual_fee = AnnualFee.objects.filter(year=current_year).first()
+
+        if annual_fee:
+            MemberAnnualDues.objects.get_or_create(
+                member=member_profile,
+                fee=annual_fee,
+                defaults={
+                    "status": MemberAnnualDues.STATUS_DUE,
+                    "amount_due": annual_fee.amount,
+                },
+            )
     application.save()
 
     ApplicationStatusHistory.objects.create(

@@ -110,7 +110,6 @@
         <h2 class="h5 fw-bold text-dark mb-1">Liste des cotisations</h2>
         <p class="small text-muted mb-0">Toutes les cotisations enregistrées.</p>
       </div>
-
       {% if dues %}
         <div class="d-none d-md-block table-responsive">
           <table class="table align-middle mb-0">
@@ -122,6 +121,7 @@
                 <th class="px-4 py-3 text-end">Payé</th>
                 <th class="px-4 py-3 text-end">Reste</th>
                 <th class="px-4 py-3">Statut</th>
+                <th class="px-4 py-3">Cotisation</th>
               </tr>
             </thead>
             <tbody>
@@ -149,6 +149,13 @@
                       <span class="badge rounded-pill text-bg-warning px-3 py-2">Partiel</span>
                     {% else %}
                       <span class="badge rounded-pill text-bg-secondary px-3 py-2">À payer</span>
+                    {% endif %}
+                  </td>
+                  <td class="px-4 py-3">
+                    {% if request.user.is_staff %}
+                      <a href="{% url 'members:add_member_dues' d.member.pk %}">
+                        <span class="badge rounded-pill text-bg-primary px-3 py-2">Ajouter cotisation annuelle</span>
+                      </a>
                     {% endif %}
                   </td>
                 </tr>
@@ -190,6 +197,13 @@
                     <div class="fw-semibold text-danger">{{ d.balance|floatformat:0|intcomma }}</div>
                   </div>
                 </div>
+                <div>
+                    {% if request.user.is_staff %}
+                      <a href="{% url 'members:add_member_dues' d.member.pk %}">
+                        <span class="badge rounded-pill text-bg-primary px-3 py-2">Ajouter cotisation annuelle</span>
+                      </a>
+                    {% endif %}
+                  </div>
               </article>
             {% endfor %}
           </div>

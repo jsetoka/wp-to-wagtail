@@ -18,6 +18,8 @@
       </div>
     {% endif %}
 
+    <div id="payment-status-message">Paiement en attente de confirmation...</div>
+
     <!-- Header -->
     <div class="mb-4 d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3">
       <div>
@@ -366,6 +368,46 @@ document.addEventListener("DOMContentLoaded", function () {
         methodSelect.addEventListener("change", toggleMomoFields);
         toggleMomoFields();
     }
+
+ 
+    function pollPaymentStatus() {
+      fetch(`/payments/status/latest`, {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          const box = document.getElementById("payment-status-message");
+
+          if (data.status === "confirmed") {
+            box.innerText = "Paiement confirmé.";
+            window.setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+            return;
+          }
+
+          if (data.status === "failed") {
+            box.innerText = "Paiement échoué.";
+            return;
+          }
+
+          if (data.status === "cancelled") {
+            box.innerText = "Paiement annulé.";
+            return;
+          }
+
+          box.innerText = "Paiement en attente de confirmation...";
+          window.setTimeout(() => pollPaymentStatus(), 5000);
+        })
+        .catch(() => {
+          window.setTimeout(() => pollPaymentStatus(), 7000);
+        });
+    }
+    pollPaymentStatus();
+
 });
 </script>
 {% endblock %}

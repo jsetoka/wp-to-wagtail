@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "members",
     "bibliotheque",
     "adhesions",
+    "payment",
 
 
     "allauth",
@@ -204,9 +205,8 @@ AUTHENTICATION_BACKENDS = (
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
+ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # ou "optional" en dev
 
 
@@ -217,3 +217,6 @@ MTN_MOMO_API_KEY = os.getenv("MTN_MOMO_API_KEY", default="")
 MTN_MOMO_TARGET_ENV = os.getenv("MTN_MOMO_TARGET_ENV", default="sandbox")  # prod: valeur fournie par MTN Congo
 MTN_MOMO_CALLBACK_URL = os.getenv("MTN_MOMO_CALLBACK_URL", default="")
 MTN_MOMO_CURRENCY = os.getenv("MTN_MOMO_CURRENCY", default="XAF")
+
+
+PAYMENT_POLL_INTERVAL_SECONDS = 10
