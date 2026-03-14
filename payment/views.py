@@ -2,14 +2,14 @@
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 
-from config import settings
+from django.conf import settings
 from payment.models import Payment
 
 import hmac
 import hashlib
 from urllib.parse import urlencode
 
-import base64
+import base64, qrcode
 from io import BytesIO
 
 from django.template.loader import render_to_string
@@ -60,7 +60,7 @@ def payment_invoice_pdf(request, payment_id):
     qr_base64 = base64.b64encode(buffer.getvalue()).decode()
 
     html_string = render_to_string(
-        "members/invoice_pdf.html",
+        "payment/invoice_pdf.html",
         {
             "payment": payment,
             "dues": payment.dues,
@@ -119,7 +119,7 @@ def verify_invoice(request):
 
     return render(
         request,
-        "members/verify_invoice.html",
+        "payment/verify_invoice.html",
         {
             "payment": payment,
             "is_valid": is_valid,
