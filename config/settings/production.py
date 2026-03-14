@@ -1,6 +1,6 @@
 from .base import *
 
-DEBUG = False
+DEBUG = True
 
 # ManifestStaticFilesStorage is recommended in production, to prevent
 # outdated JavaScript / CSS assets being served from cache
@@ -17,6 +17,7 @@ except ImportError:
 SECRET_KEY = "django-insecure-dasg7+r=9_z6enw*ipvv@nz)$_b^likl*)-738q0+v(vn#5-6f"
 
 ALLOWED_HOSTS = ["51.255.196.187", "oic.kerenes-digital.com"]
+CSRF_TRUSTED_ORIGINS="https://oic.kerenes-digital.com","https://www.oic.kerenes-digital.com", "http://127.0.0.1"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 DATABASES = {

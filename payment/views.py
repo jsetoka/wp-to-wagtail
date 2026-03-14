@@ -107,7 +107,7 @@ def verify_invoice(request):
             sig_ok = hmac.compare_digest(provided_sig, expected_sig)
             year_ok = str(payment.dues.fee.year) == str(year)
             amount_ok = str(payment.amount) == str(amount)
-            status_ok = payment.status == "confirmed"
+            status_ok = payment.status == payment.STATUS_CONFIRMED
 
             is_valid = sig_ok and year_ok and amount_ok and status_ok
 

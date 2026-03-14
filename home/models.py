@@ -108,7 +108,7 @@ class HomePage(Page):
 
         MultiFieldPanel(
             [
-                InlinePanel("quick_links", label="Cartes", min_num=3, max_num=3),
+                InlinePanel("quick_links", label="Cartes", min_num=3, max_num=4),
             ],
             heading="Cartes (Documentation / Actualité / Tableau...)",
         ),
@@ -204,8 +204,6 @@ class HomeQuickLink(Orderable):
         if blog_index:
             qs = qs.descendant_of(blog_index)
 
-        # 4) On fournit au template
-        context["latest_articles"] = qs[: self.latest_articles_count]
 
         # Optionnel : mettre aussi les featured pour un bandeau
         context["featured_articles"] = qs.filter(featured=True)[:3]

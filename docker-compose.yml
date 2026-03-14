@@ -8,7 +8,7 @@ services:
       - .:/app
       - ./media:/app/media
     environment:
-      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
       DATABASE_URL: postgres://wagtail:wagtail@db:5432/wagtail
     depends_on:
       - db

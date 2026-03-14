@@ -13,5 +13,3 @@ python-dotenv>=1.0
 weasyprint
 gunicorn>=23.0.0,<26
 qrcode[pil]
-celery
-redis

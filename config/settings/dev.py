@@ -10,6 +10,7 @@ SECRET_KEY = "django-insecure-dasg7+r=9_z6enw*ipvv@nz)$_b^likl*)-738q0+v(vn#5-6f
 ALLOWED_HOSTS = ["*"]
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+CSRF_TRUSTED_ORIGINS="https://oic.kerenes-digital.com","https://www.oic.kerenes-digital.com","http://127.0.0.1",
 
 try:
     from .local import *

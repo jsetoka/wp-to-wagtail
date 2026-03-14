@@ -341,7 +341,7 @@ from adhesions.models import Application
 from adhesions.choices import ApplicationStatus
 
 class DashboardView(StaffRequiredMixin, View):
-    template_name = "adhesions/dashboard.html"
+    template_name = "adhesions/admin_dashboard.html"
 
     def get(self, request):
         counts_by_status = dict(

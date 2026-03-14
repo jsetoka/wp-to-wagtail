@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mon tableau de bord{% endblock %}
+
+{% block content %}
+<section class="py-3">
+  <div class="container-fluid px-0">
+    <!-- Header -->
+    <div class="mb-4 d-flex flex-column flex-xl-row align-items-xl-center justify-content-xl-between gap-3">
+      <div>
+        <p class="mb-1 small fw-semibold text-uppercase text-success">
+          Membre
+        </p>
+        <h1 class="h2 fw-bold text-dark mb-2">
+          Mon tableau de bord
+        </h1>
+        <p class="text-muted mb-0">
+          Bienvenue{% if request.user.first_name %}, {{ request.user.first_name }}{% endif %}.
+          Retrouvez ici l’état de votre compte, vos cotisations et votre dossier.
+        </p>
+      </div>
+    </div>
+    <div class="row g-4">
+
+      {# Bloc 1 — Mon statut #}
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h5 mb-0">Mon statut</h2>
+              <span class="badge bg-primary-subtle text-primary">Compte</span>
+            </div>
+
+            <div class="mb-3">
+              <div class="text-muted small">Membre lié</div>
+              {% if member %}
+                <div class="fw-semibold text-success">Oui</div>
+              {% else %}
+                <div class="fw-semibold text-danger">Non</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <div class="text-muted small">Numéro de membre</div>
+              <div class="fw-semibold">
+                {% if member_number %}
+                  {{ member_number }}
+                {% elif member and member.member_no %}
+                  {{ member.member_no }}
+                {% else %}
+                  <span class="text-muted">Non attribué</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div>
+              <div class="text-muted small">Statut du compte</div>
+              <div class="fw-semibold">
+                {% if account_status is not None %}
+                  {{ account_status|yesno:"Actif,Inactif" }}
+                {% elif member %}
+                  {{ member.is_active_member|yesno:"Actif,Inactif" }}
+                {% else %}
+                  <span class="text-muted">Statut indisponible</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Bloc 2 — Mes cotisations #}
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h5 mb-0">Mes cotisations</h2>
+              <span class="badge bg-warning-subtle text-warning-emphasis">Suivi</span>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-12 col-md-4">
+                <div class="p-3 rounded bg-light h-100">
+                  <div class="text-muted small">Total dû</div>
+                  <div class="fw-bold fs-5">
+                    {% if dues_summary.total_due is not None %}
+                      {{ dues_summary.total_due }}
+                    {% else %}
+                      0
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-4">
+                <div class="p-3 rounded bg-light h-100">
+                  <div class="text-muted small">Total payé</div>
+                  <div class="fw-bold fs-5">
+                    {% if dues_summary.total_paid is not None %}
+                      {{ dues_summary.total_paid }}
+                    {% else %}
+                      0
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-4">
+                <div class="p-3 rounded bg-light h-100">
+                  <div class="text-muted small">Dernière année impayée</div>
+                  <div class="fw-bold fs-5">
+                    {% if dues_summary.last_unpaid_year %}
+                      {{ dues_summary.last_unpaid_year }}
+                    {% else %}
+                      <span class="text-success">Aucune</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <a href="{% url 'members:dues_list' %}" class="btn btn-outline-primary">
+              Voir mes cotisations
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {# Bloc 3 — Mon dossier #}
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h5 mb-0">Mon dossier</h2>
+              <span class="badge bg-info-subtle text-info-emphasis">Adhésion</span>
+            </div>
+
+            <div class="mb-3">
+              <div class="text-muted small">Mes demandes d’adhésion</div>
+              <div class="fw-semibold">
+                {% if applications_url %}
+                  <a href="{{ applications_url }}">Consulter mes demandes</a>
+                {% else %}
+                  <span class="text-muted">Lien indisponible</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="text-muted small">Statut courant</div>
+              <div class="fw-semibold">
+                {% if current_application %}
+                  {% if current_application.get_status_display %}
+                    {{ current_application.get_status_display }}
+                  {% elif current_application.status %}
+                    {{ current_application.status }}
+                  {% else %}
+                    <span class="text-muted">Statut indisponible</span>
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">Aucun dossier en cours</span>
+                {% endif %}
+              </div>
+            </div>
+
+            {% if current_application %}
+              <div class="text-muted small">
+                {% if current_application.reference %}
+                  Référence : {{ current_application.reference }}
+                {% elif current_application.application_number %}
+                  Référence : {{ current_application.application_number }}
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {# Bloc 4 — Actions rapides #}
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h5 mb-0">Actions rapides</h2>
+              <span class="badge bg-success-subtle text-success-emphasis">Accès direct</span>
+            </div>
+
+            <div class="d-grid gap-3">
+              {% if dues_summary.last_unpaid_year %}
+                <a
+                  href="{% url 'members:dues_detail' dues_summary.last_unpaid_year %}"
+                  class="btn btn-primary">
+                  Payer une cotisation
+                </a>
+              {% else %}
+                <a href="{% url 'members:dues_list' %}" class="btn btn-outline-primary">
+                  Voir mes cotisations
+                </a>
+              {% endif %}
+
+              {% if applications_url %}
+                <a href="{{ applications_url }}" class="btn btn-outline-secondary">
+                  Consulter mon dossier
+                </a>
+              {% else %}
+                <button class="btn btn-outline-secondary" disabled>
+                  Consulter mon dossier
+                </button>
+              {% endif %}
+
+              {% if documents_url %}
+                <a href="{{ documents_url }}" class="btn btn-outline-secondary">
+                  Télécharger mes documents
+                </a>
+              {% else %}
+                <button class="btn btn-outline-secondary" disabled>
+                  Télécharger mes documents
+                </button>
+              {% endif %}
+
+              {% if profile_url %}
+                <a href="{{ profile_url }}" class="btn btn-outline-secondary">
+                  Modifier mon profil
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    {% if not member %}
+      <div class="alert alert-warning mt-4" role="alert">
+        Aucun profil membre n’est actuellement associé à votre compte.
+        Veuillez contacter l’administration si cette situation est anormale.
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

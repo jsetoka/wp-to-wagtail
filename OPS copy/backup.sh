@@ -11,16 +11,16 @@ BACKUP_FILE="${DB_BACKUP_DIR}/${APP_NAME}_${DB_NAME}_${TIMESTAMP}.dump"
 
 mkdir -p "${DB_BACKUP_DIR}" "${LOG_DIR}"
 
-export PGPASSWORD="${DB_PASSWORD}"
-
 echo "[INFO] Début backup PostgreSQL : ${DB_NAME}"
-pg_dump \
-  -h "${DB_HOST}" \
-  -p "${DB_PORT}" \
-  -U "${DB_USER}" \
-  -d "${DB_NAME}" \
-  -Fc \
-  -f "${BACKUP_FILE}"
+
+docker exec \
+  -e PGPASSWORD="${DB_PASSWORD}" \
+  "${DB_RESTORE_NAME:-postgres-db}" \
+  pg_dump \
+    -U "${DB_USER}" \
+    -d "${DB_NAME}" \
+    -Fc \
+> "${BACKUP_FILE}"
 
 echo "[INFO] Backup créé : ${BACKUP_FILE}"
 

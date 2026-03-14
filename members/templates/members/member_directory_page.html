@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+    <div class="mb-4">
+        <h1 class="mb-3">{{ page.title }}</h1>
+
+        {% if page.intro %}
+            <div class="mb-4">
+                {{ page.intro|richtext }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-9">
+                    <label for="q" class="form-label">Rechercher</label>
+                    <input
+                        type="text"
+                        name="q"
+                        id="q"
+                        class="form-control"
+                        value="{{ search_query }}"
+                        placeholder="Nom, prénom, référence, email, spécialité..."
+                    >
+                </div>
+                <div class="col-md-3 d-grid">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <p class="text-muted mb-3">
+        {{ total_members }} membre{{ total_members|pluralize }}
+    </p>
+
+    {% if applications %}
+
+        {# Affichage mobile : cartes #}
+        <div class="d-block d-md-none">
+            <div class="row g-3">
+                {% for app in applications %}
+                    <div class="col-12">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                    <div>
+                                        <h2 class="h6 mb-1">
+                                            {{ app.last_name }} {{ app.first_name }}
+                                        </h2>
+                                        <div class="small text-muted">
+                                            Réf. {{ app.reference }}
+                                        </div>
+                                    </div>
+
+                                    <div class="text-end">
+                                        {% if app.get_status_display %}
+                                            <span class="badge bg-success">
+                                                {{ app.get_status_display }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-success">
+                                                {{ app.status }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="small">
+                                    <div class="mb-2">
+                                        <span class="text-muted d-block">Email</span>
+                                        <span>{{ app.email }}</span>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <span class="text-muted d-block">Téléphone</span>
+                                        <span>{{ app.phone }}</span>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <span class="text-muted d-block">Profession</span>
+                                        <span>{{ app.profession|default:"—" }}</span>
+                                    </div>
+
+                                    <div>
+                                        <span class="text-muted d-block">Spécialisation</span>
+                                        <span>{{ app.specialization|default:"—" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# Affichage desktop/tablette large : tableau #}
+        <div class="card shadow-sm border-0 d-none d-md-block">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Référence</th>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Profession</th>
+                                <th>Spécialisation</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                                <tr>
+                                    <td class="fw-semibold">{{ app.reference }}</td>
+                                    <td>{{ app.last_name }}</td>
+                                    <td>{{ app.first_name }}</td>
+                                    <td>{{ app.email }}</td>
+                                    <td>{{ app.phone }}</td>
+                                    <td>{{ app.profession|default:"—" }}</td>
+                                    <td>{{ app.specialization|default:"—" }}</td>
+                                    <td>
+                                        {% if app.get_status_display %}
+                                            <span class="badge bg-success">{{ app.get_status_display }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success">{{ app.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-muted">
+                Aucune candidature validée trouvée.
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

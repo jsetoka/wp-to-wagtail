@@ -169,13 +169,8 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 WAGTAIL_SITE_NAME = "config"
 ACCOUNT_ADAPTER = "members.adapters.CustomAccountAdapter"
 ACCOUNT_LOGIN_METHODS = {"email", "username"}
-ACCOUNT_SIGNUP_FIELDS = [
-    "username*",
-    "email*",
-    "password1*",
-    "password2*",
-]
-
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # ou "optional" en dev
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html
 WAGTAILSEARCH_BACKENDS = {
@@ -204,11 +199,6 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
-
-ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # ou "optional" en dev
-
 
 MTN_MOMO_BASE_URL = os.getenv("MTN_MOMO_BASE_URL", default="https://sandbox.momodeveloper.mtn.com")
 MTN_MOMO_COLLECTION_PRIMARY_KEY = os.getenv("MTN_MOMO_COLLECTION_PRIMARY_KEY", default="")

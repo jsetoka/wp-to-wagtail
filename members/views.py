@@ -1,23 +1,124 @@
 # members/views.py
 from decimal import Decimal, InvalidOperation
+import uuid
 from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 
-from adhesions.mixins import OICStaffRequiredMixin, StaffRequiredMixin
-from members.models import MemberAnnualDues, AnnualFee, Payment
+from adhesions.mixins import OICStaffRequiredMixin
+from members.models import MemberAnnualDues, AnnualFee
+from payment.models import Payment
 from payment.services import MtnMomoClient, MtnMomoError
 
 from django.core.exceptions import PermissionDenied
-
-from django.db.models import Sum, F, Value, DecimalField
+from django.db.models import Sum, Value, DecimalField
 from django.db.models.functions import Coalesce
+from django.views import View
+from .forms import MemberAnnualDuesForm
+from decimal import Decimal
+from django.urls import reverse
 
-from members.models import Member
+from adhesions.models import Application
+from members.models import MemberProfile
 
 
-from .models import MemberProfile
+def get_current_member_profile(user):
+    try:
+        return user.member_profile
+    except MemberProfile.DoesNotExist:
+        return None
+
+
+@login_required
+def dashboard(request):
+    #  member = get_current_member_profile(request.user)
+    member = MemberProfile.objects.get(user=request.user)
+
+    current_application = None
+    total_due = Decimal("0")
+    total_paid = Decimal("0")
+    last_unpaid_year = None
+    dues = MemberAnnualDues.objects.none()
+
+    if member:
+        dues = (
+            MemberAnnualDues.objects
+            .filter(member=member)
+            .select_related("fee")
+            .order_by("-fee__year")
+        )
+
+        total_due = dues.aggregate(
+            total=Coalesce(
+                Sum("amount_due"),
+                Value(0),
+                output_field=DecimalField(max_digits=12, decimal_places=2),
+            )
+        )["total"] or Decimal("0")
+
+        total_paid = sum((due.amount_paid for due in dues), Decimal("0"))
+
+        unpaid_due = dues.exclude(status="paid").order_by("fee__year").first()
+        if unpaid_due and unpaid_due.fee:
+            last_unpaid_year = unpaid_due.fee.year
+
+    applications = (
+        Application.objects
+        .filter(candidate=request.user.candidate_profile)
+        .order_by("-created_at")
+    )
+    current_application = applications.first()
+
+    account_status = None
+    member_number = None
+
+    if member:
+        member_number = getattr(member, "member_no", None)
+        account_status = member.is_active_member
+
+    applications_url = None
+    documents_url = None
+    profile_url = None
+
+    try:
+        applications_url = reverse("adhesions:my_applications")
+    except Exception:
+        pass
+
+    try:
+        documents_url = reverse("members:documents")
+    except Exception:
+        pass
+
+    try:
+        profile_url = reverse("members:profile")
+    except Exception:
+        pass
+
+    if not member:
+        messages.warning(
+            request,
+            "Aucun profil membre n’est actuellement associé à votre compte."
+        )
+
+    context = {
+        "member": member,
+        "member_number": member_number,
+        "account_status": account_status,
+        "dues_summary": {
+            "total_due": total_due,
+            "total_paid": total_paid,
+            "last_unpaid_year": last_unpaid_year,
+        },
+        "dues": dues[:5],
+        "current_application": current_application,
+        "applications_url": applications_url,
+        "documents_url": documents_url,
+        "profile_url": profile_url,
+    }
+
+    return render(request, "members/dashboard.html", context)
 
 
 @login_required
@@ -113,17 +214,18 @@ def dues_detail(request, year: int):
                 messages.error(request, f"Le paiement mobile a échoué: {e}")
 
             return redirect("members:dues_detail", year=year)
-
-        # paiements manuels
-        payment = Payment.objects.create(
-            dues=dues,
-            amount=amount,
-            method=method,
-            status=Payment.STATUS_INITIATED,
-        )
-        payment.confirm()
-        messages.success(request, "Paiement enregistré.")
-        return redirect("members:dues_detail", year=year)
+        else:
+            # paiements manuels
+            payment = Payment.objects.create(
+                dues=dues,
+                amount=amount,
+                method=method,
+                reference=str(uuid.uuid4()),
+                status=Payment.STATUS_INITIATED,
+            )
+            payment.mark_pending()
+            messages.success(request, "Paiement enregistré.")
+            return redirect("members:dues_detail", year=year)
 
     payments = dues.payments.order_by("-initiated_at", "-confirmed_at")
     return render(
@@ -203,14 +305,25 @@ def admin_cotisation_list(request):
     return render(request, "members/admin_cotisation_list.html", context)
 
 
+@login_required
+def admin_dues_payments_detail(request, pk):
+    if not request.user.is_staff:
+        raise PermissionDenied
 
-# members/views.py
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views import View
+    dues = get_object_or_404(
+        MemberAnnualDues.objects.select_related("member", "member__user", "fee"),
+        pk=pk,
+    )
 
-from .forms import MemberAnnualDuesForm
-from .models import MemberProfile, MemberAnnualDues
+    payments = dues.payments.order_by("-initiated_at", "-confirmed_at", "-id")
+
+    context = {
+        "dues": dues,
+        "payments": payments,
+    }
+    return render(request, "members/admin_dues_payments_detail.html", context)
+
+
 
 class AddMemberAnnualDuesView(OICStaffRequiredMixin, View):
     template_name = "members/add_member_annual_dues.html"
@@ -251,3 +364,63 @@ class AddMemberAnnualDuesView(OICStaffRequiredMixin, View):
             "form": form,
         })
 
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+
+from .forms import MemberProfileUpdateForm
+from .models import MemberProfile
+
+
+@login_required
+def profile(request):
+    member = MemberProfile.objects.filter(user=request.user).first()
+
+    if request.method == "POST":
+        form = MemberProfileUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Votre profil a été mis à jour avec succès.")
+            return redirect("members:profile")
+    else:
+        form = MemberProfileUpdateForm(instance=request.user)
+
+    return render(
+        request,
+        "members/profile.html",
+        {
+            "member": member,
+            "form": form,
+        },
+    )
+
+@login_required
+def approve_payment(request, pk):
+    if not request.user.is_staff:
+        raise PermissionDenied
+
+    if request.method != "POST":
+        raise PermissionDenied
+
+    payment = get_object_or_404(Payment.objects.select_related("dues"), pk=pk)
+
+    # Autoriser uniquement pending -> approved
+    if payment.status != payment.STATUS_PENDING:
+        messages.error(
+            request,
+            "Seuls les paiements en attente peuvent être approuvés."
+        )
+        return redirect("members:admin_dues_payments_detail", pk=payment.dues.pk)
+
+    payment.status = payment.STATUS_CONFIRMED 
+
+    if hasattr(payment, "confirmed_at"):
+        from django.utils import timezone
+        payment.confirmed_at = timezone.now()
+        payment.save(update_fields=["status", "confirmed_at"])
+    else:
+        payment.save(update_fields=["status"])
+
+    messages.success(request, "Le paiement a été approuvé avec succès.")
+    return redirect("members:admin_dues_payments_detail", pk=payment.dues.pk)

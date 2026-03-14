@@ -18,7 +18,7 @@
       </div>
     {% endif %}
 
-    <div id="payment-status-message">Paiement en attente de confirmation...</div>
+    <div id="payment-status-message"></div>
 
     <!-- Header -->
     <div class="mb-4 d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3">
@@ -398,8 +398,6 @@ document.addEventListener("DOMContentLoaded", function () {
             box.innerText = "Paiement annulé.";
             return;
           }
-
-          box.innerText = "Paiement en attente de confirmation...";
           window.setTimeout(() => pollPaymentStatus(), 5000);
         })
         .catch(() => {

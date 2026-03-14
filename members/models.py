@@ -11,7 +11,7 @@ from modelcluster.models import ClusterableModel
 import uuid
 
 from django.conf import settings
-from django.db.models import Sum
+
 
 
 @register_snippet
@@ -171,11 +171,6 @@ class MemberAnnualDues(models.Model):
         return max(0, min(pct, 100))
 
 
-from wagtail.snippets.models import register_snippet
-from wagtail.admin.panels import FieldPanel, InlinePanel
-from modelcluster.models import ClusterableModel
-from modelcluster.fields import ParentalKey
-from wagtail.models import Orderable
 
 @register_snippet
 class UserMenuFragment(ClusterableModel):
@@ -213,3 +208,59 @@ class UserMenuFragmentItem(Orderable):
 
     def __str__(self):
         return self.label
+    
+
+
+from wagtail.fields import RichTextField
+
+
+from django.db.models import Q
+from wagtail.fields import RichTextField
+from wagtail.models import Page
+from wagtail.admin.panels import FieldPanel
+
+from adhesions.models import Application
+from adhesions.choices import ApplicationStatus
+
+
+class MemberDirectoryPage(Page):
+    template = "members/member_directory_page.html"
+    intro = RichTextField(blank=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel("intro"),
+    ]
+
+    subpage_types = []
+    parent_page_types = ["home.HomePage", "home.StandardPage"]
+
+    def get_context(self, request):
+        context = super().get_context(request)
+
+        q = (request.GET.get("q") or "").strip()
+
+        applications = (
+            Application.objects
+            .select_related("candidate")
+            .filter(status=ApplicationStatus.APPROVED)
+            .order_by("last_name", "first_name", "reference")
+        )
+
+        if q:
+            applications = applications.filter(
+                Q(reference__icontains=q) |
+                Q(first_name__icontains=q) |
+                Q(last_name__icontains=q) |
+                Q(email__icontains=q) |
+                Q(phone__icontains=q) |
+                Q(profession__icontains=q) |
+                Q(specialization__icontains=q) |
+                Q(candidate__first_name__icontains=q) |
+                Q(candidate__last_name__icontains=q) |
+                Q(candidate__email__icontains=q)
+            )
+
+        context["applications"] = applications
+        context["search_query"] = q
+        context["total_members"] = applications.count()
+        return context

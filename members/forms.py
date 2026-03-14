@@ -37,3 +37,37 @@ class MemberAnnualDuesForm(forms.ModelForm):
             obj.save()
 
         return obj
+    
+
+from django import forms
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class MemberProfileUpdateForm(forms.ModelForm):
+    first_name = forms.CharField(
+        label="Prénom",
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    last_name = forms.CharField(
+        label="Nom",
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    email = forms.EmailField(
+        label="Adresse email",
+        required=False,
+        widget=forms.EmailInput(attrs={"class": "form-control", "readonly": "readonly"}),
+    )
+
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        return user
